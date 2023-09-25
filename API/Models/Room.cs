@@ -1,8 +1,14 @@
-namespace BookingManagementApp.Models;
-public class Room : GeneralAtribute
+using System;
+namespace BookingManagementApp.Models
 {
-    public Guid Guid { get; set; }
-    public string Name { get; set; }
-    public int Floor { get; set; }
-    public int Capacity { get; set; }
+    [Table("tb_m_rooms")]
+    public class Room : GeneralAtribute
+    {
+        [Column("name", TypeName = "nvarchar(100)")]
+        public string Name { get; set; }
+        [Column("floor")]
+        public int Floor { get; set; }
+        [Column("capacity")]
+        public int Capacity { get; set; }
+    }
 }

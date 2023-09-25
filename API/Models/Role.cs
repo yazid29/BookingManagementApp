@@ -1,6 +1,10 @@
-namespace BookingManagementApp.Models;
-public class Role : GeneralAtribute
+using System;
+namespace BookingManagementApp.Models
 {
-    public Guid Guid { get; set; }
-    public string Name { get; set; }
+    [Table("tb_m_roles")]
+    public class Role : GeneralAtribute
+    {
+        [Column("name", TypeName = "nvarchar(100)")]
+        public string Name { get; set; }
+    }
 }

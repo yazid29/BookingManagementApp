@@ -1,10 +1,19 @@
-namespace BookingManagementApp.Models;
-public class Account : GeneralAtribute
+using System;
+namespace BookingManagementApp.Models
 {
-    public Guid Guid { get; set; }
-    public string Password { get; set; }
-    public bool is_deleted { get; set; }
-    public int otp { get; set; }
-    public bool is_used { get; set; }
-    public DateTime expired_date { get; set; }
+    [Table("tb_m_accounts")]
+    public class Account : GeneralAtribute
+    {
+        [Column("password", TypeName = "nvarchar(100)")]
+        public string Password { get; set; }
+        [Column("is_deleted")]
+        public bool IsDeleted { get; set; }
+        [Column("otp")]
+        public int Otp { get; set; }
+        [Column("is_used")]
+        public bool IsUsed { get; set; }
+        [Column("expired_date")]
+        public DateTime ExpiredDate { get; set; }
+    }
+
 }

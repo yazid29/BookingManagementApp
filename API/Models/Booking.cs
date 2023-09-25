@@ -1,11 +1,20 @@
-namespace BookingManagementApp.Models;
-public class Booking : GeneralAtribute
+using System;
+namespace BookingManagementApp.Models
 {
-    public Guid Guid { get; set; }
-    public Datetime StartDate { get; set; }
-    public Datetime EndDate { get; set; }
-    public int Status { get; set; }
-    public string Remarks { get; set; }
-    public Guid RoomGuid { get; set; }
-    public Guid EmployeeGuid { get; set; }
+    [Table("tb_m_bookings")]
+    public class Booking : GeneralAtribute
+    {
+        [Column("start_date")]
+        public DateTime StartDate { get; set; }
+        [Column("end_date")]
+        public DateTime EndDate { get; set; }
+        [Column("status")]
+        public int Status { get; set; }
+        [Column("remarks", TypeName = "nvarchar(255)")]
+        public string Remarks { get; set; }
+        [Column("room_guid")]
+        public Guid RoomGuid { get; set; }
+        [Column("employee_guid")]
+        public Guid EmployeeGuid { get; set; }
+    }
 }

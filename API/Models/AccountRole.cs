@@ -1,8 +1,13 @@
-namespace BookingManagementApp.Models;
-public class AccountRole : GeneralAtribute
+using System;
+namespace BookingManagementApp.Models
 {
-    public Guid Guid { get; set; }
-    public Guid AccountGuid { get; set; }
-    public Guid RoleGuid { get; set; }
+    [Table("tb_m_account_roles")]
+    public class AccountRole : GeneralAtribute
+    {
+        [Column("account_guid"]
+        public Guid AccountGuid { get; set; }
+        [Column("role_guid")]
+        public Guid RoleGuid { get; set; }
 
+    }
 }
