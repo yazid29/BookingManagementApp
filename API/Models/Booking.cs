@@ -1,3 +1,4 @@
+using API.Utilities.Enums;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace BookingManagementApp.Models
