@@ -9,7 +9,7 @@ namespace BookingManagementApp.Models
         [Column("end_date")]
         public DateTime EndDate { get; set; }
         [Column("status")]
-        public int Status { get; set; }
+        public StatusLevel Status { get; set; }
         [Column("remarks", TypeName = "nvarchar(255)")]
         public string Remarks { get; set; }
         [Column("room_guid")]
