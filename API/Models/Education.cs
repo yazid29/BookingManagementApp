@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace BookingManagementApp.Models
 {
     [Table("tb_m_educations")]
@@ -12,7 +13,5 @@ namespace BookingManagementApp.Models
         public float Gpa { get; set; }
         [Column("university_guid")]
         public Guid UniversityGuid { get; set; }
-        //public DateTime CreatedDate { get; set; }
-        //public DateTime ModifiedDate { get; set; }
     }
 }

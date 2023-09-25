@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace BookingManagementApp.Models
 {
-    public class GeneneralAtribute
+    public class GeneralAtribute
     {
         [Key,Column("code", TypeName = "nvarchar(50)")]
         public Guid Guid { get; set; }

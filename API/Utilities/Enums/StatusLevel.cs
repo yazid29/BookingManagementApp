@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace API.Utilities.Enums
 {
     
@@ -9,6 +11,6 @@ namespace API.Utilities.Enums
         Rejected,
         Canceled,
         Completed,
-        [Display[Name = "On Going]] Ongoing
+        [Display (Name = "On Going")] Ongoing
     }
 }

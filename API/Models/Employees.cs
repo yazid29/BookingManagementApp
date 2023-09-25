@@ -1,6 +1,7 @@
 
+using API.Utilities.Enums;
 using System;
-
+using System.ComponentModel.DataAnnotations.Schema;
 namespace BookingManagementApp.Models
 {
     [Table("tb_m_employees")]
@@ -10,8 +11,9 @@ namespace BookingManagementApp.Models
         public string Nik { get; set; }
         [Column("first_name", TypeName = "nvarchar(100)")]
         public string FirstName { get; set; }
+
         [Column("last_name", TypeName = "nvarchar(100)")]
-        public string LastName? { get; set; }
+        public string? LastName { get; set; }
         [Column("birth_date")]
         public DateTime BirthDate { get; set; }
         [Column("gender")]

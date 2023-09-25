@@ -1,9 +1,12 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace BookingManagementApp.Models
 {
     [Table("tb_m_accounts")]
     public class Account : GeneralAtribute
     {
+        
         [Column("password", TypeName = "nvarchar(100)")]
         public string Password { get; set; }
         [Column("is_deleted")]
@@ -15,5 +18,4 @@ namespace BookingManagementApp.Models
         [Column("expired_date")]
         public DateTime ExpiredDate { get; set; }
     }
-
 }
