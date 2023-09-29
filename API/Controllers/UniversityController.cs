@@ -56,28 +56,33 @@ namespace API.Controllers
         }
 
         // Update data sesuai ID dengan metode PUT
-        [HttpPut("{guid}")]
+        [HttpPut]
         public IActionResult Update(University university)
         {
-            var result = _universityRepository.Update(university);
-            if (result is false)
+            var resultUpdate = _universityRepository.Update(university);
+            if (resultUpdate is false)
             {
                 return BadRequest("Failed to Update data");
             }
-            return Ok(result);
+            return Ok(resultUpdate);
         }
 
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete("{guid}")]
-        public IActionResult Delete(University university)
+        public IActionResult Delete(Guid guid)
         {
-            var result = _universityRepository.Delete(university);
-            if (result is false)
+            var result = _universityRepository.GetByGuid(guid);
+            if (result is null)
+            {
+                return NotFound("Id Not Found");
+            }
+
+            var delete = _universityRepository.Delete(result);
+            if (delete is false)
             {
                 return BadRequest("Failed to Delete data");
             }
-            return Ok(result);
+            return Ok(delete);
         }
-        
     }
 }
