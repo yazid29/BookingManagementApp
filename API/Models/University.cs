@@ -10,7 +10,8 @@ namespace BookingManagementApp.Models
         public string Code { get; set; }
         [Column("name", TypeName = "nvarchar(100)")]
         public string Name { get; set; }
-        //public DateTime CreatedDate { get; set; }
-        //public DateTime ModifiedDate { get; set; }
+
+        // Cardinality One To Many
+        public ICollection<Education>? Educations { get; set; }
     }
 }

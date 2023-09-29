@@ -13,5 +13,9 @@ namespace BookingManagementApp.Models
         public float Gpa { get; set; }
         [Column("university_guid")]
         public Guid UniversityGuid { get; set; }
+        // Cardinality Many to One
+        public University? University { get; set; }
+        // Cardinality One to One
+        public Employee? Employee { get; set; }
     }
 }

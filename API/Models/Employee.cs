@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BookingManagementApp.Models
 {
     [Table("tb_m_employees")]
-    public class Employees : GeneralAtribute
+    public class Employee : GeneralAtribute
     {
         [Column("nik", TypeName = "nchar(6)")]
         public string Nik { get; set; }
@@ -25,5 +25,11 @@ namespace BookingManagementApp.Models
         [Column("phone_number", TypeName = "nvarchar(20)")]
         public string PhoneNumber { get; set; }
 
+        // Cardinality One To Many
+        public ICollection<Booking>? Bookings { get; set; }
+        
+        // Cardinality One To One
+        public Education? Education { get; set; }
+        public Account? Account { get; set; }
     }
 }

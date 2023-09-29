@@ -17,5 +17,10 @@ namespace BookingManagementApp.Models
         public bool IsUsed { get; set; }
         [Column("expired_date")]
         public DateTime ExpiredDate { get; set; }
+
+        // Cardinality One To One
+        public Employee? Employee { get; set; }
+        // Cardinality One To Many
+        public ICollection<AccountRole>? AccountRoles { get; set;}
     }
 }

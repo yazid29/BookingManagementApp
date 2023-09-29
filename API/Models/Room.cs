@@ -11,5 +11,7 @@ namespace BookingManagementApp.Models
         public int Floor { get; set; }
         [Column("capacity")]
         public int Capacity { get; set; }
+        // Cardinality One To Many
+        public ICollection<Booking>? Bookings { get; set; }
     }
 }

@@ -10,5 +10,9 @@ namespace BookingManagementApp.Models
         [Column("role_guid")]
         public Guid RoleGuid { get; set; }
 
+        // Cardinality Many To One
+        public Role? Role { get; set;}
+        // Cardinality Many To One
+        public Account? Account { get; set;}
     }
 }
