@@ -7,46 +7,17 @@ namespace API.Controllers
     [ApiController]
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
-    public class UniversityController : ControllerBase
+    public class BookingController : ControllerBase
     {
-        // hubungkan repository dengan controller
-        private readonly IUniversityRepository _universityRepository;
-
-        public UniversityController(IUniversityRepository universityRepository)
-        {
-            _universityRepository = universityRepository;
+        private readonly IBookingRepository _bookingRepository;
+        public BookingController(IBookingRepository bookingRepository) { 
+            _bookingRepository = bookingRepository;
         }
-
-        // tampilkan semua data dengan metode GET
-        [HttpGet]
-        public IActionResult GetAll()
-        {
-            var result = _universityRepository.GetAll();
-            if (!result.Any())
-            {
-                return NotFound("Data Not Found");
-            }
-
-            return Ok(result);
-        }
-
-        // tampilkan data sesuai ID dengan metode GET
-        [HttpGet("{guid}")]
-        public IActionResult GetByGuid(Guid guid)
-        {
-            var result = _universityRepository.GetByGuid(guid);
-            if (result is null)
-            {
-                return NotFound("Id Not Found");
-            }
-            return Ok(result);
-        }
-
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(University university)
+        public IActionResult Create(Booking booking)
         {
-            var result = _universityRepository.Create(university);
+            var result = _bookingRepository.Create(booking);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
@@ -54,29 +25,50 @@ namespace API.Controllers
 
             return Ok(result);
         }
+        // tampilkan semua data dengan metode GET
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var result = _bookingRepository.GetAll();
+            if (!result.Any())
+            {
+                return BadRequest("Data not Found");
+            }
 
+            return Ok(result);
+        }
+        // tampilkan data sesuai ID dengan metode GET
+        [HttpGet("{guid}")]
+        public IActionResult GetByGuid(Guid guid)
+        {
+            var result = _bookingRepository.GetByGuid(guid);
+            if (result is null)
+            {
+                return NotFound("Id Not Found");
+            }
+            return Ok(result);
+        }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(University university)
+        public IActionResult Update(Booking booking)
         {
-            var resultUpdate = _universityRepository.Update(university);
+            var resultUpdate = _bookingRepository.Update(booking);
             if (resultUpdate is false)
             {
                 return BadRequest("Failed to Update data");
             }
             return Ok(resultUpdate);
         }
-
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
-            var result = _universityRepository.GetByGuid(guid);
+            var result = _bookingRepository.GetByGuid(guid);
             if (result is null)
             {
                 return NotFound("Id Not Found");
             }
-            var delete = _universityRepository.Delete(result);
+            var delete = _bookingRepository.Delete(result);
             if (delete is false)
             {
                 return BadRequest("Failed to Delete data");
