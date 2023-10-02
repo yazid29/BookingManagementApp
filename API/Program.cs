@@ -18,6 +18,7 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepos>();
 builder.Services.AddScoped<IRoleRepository, RoleRepos>();
 builder.Services.AddScoped<IRoomRepository, RoomRepos>();
 builder.Services.AddScoped<IUniversityRepository, UniversityRepos>();
+//
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

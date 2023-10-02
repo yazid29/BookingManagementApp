@@ -3,12 +3,14 @@ using BookingManagementApp.Models;
 
 namespace API.Contracts
 {
-    public interface IUniversityRepository 
+    public interface IUniversityRepository : IGeneralRepos<University>
     {
+        /*
         IEnumerable<University> GetAll();
         University? GetByGuid(Guid guid);
         University? Create(University university);
         bool Update(University university);
         bool Delete(University university);
+        */
     }
 }
