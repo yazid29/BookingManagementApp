@@ -1,7 +1,7 @@
 ﻿using API.Contracts;
+using API.DTO.Rooms;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Drawing.Text;
 
 namespace API.Controllers
 {
@@ -19,15 +19,15 @@ namespace API.Controllers
 
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(Room room)
+        public IActionResult Create(CreateRoomDto roomDto)
         {
-            var result = _roomRepository.Create(room);
+            var result = _roomRepository.Create(roomDto);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
             }
 
-            return Ok(result);
+            return Ok((RoomDto) result);
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -39,7 +39,9 @@ namespace API.Controllers
                 return BadRequest("Data not Found");
             }
 
-            return Ok(result);
+            var data = result.Select(x => (RoomDto) x );
+
+            return Ok(data);
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -50,21 +52,31 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-            return Ok(result);
+            return Ok((RoomDto) result);
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(Room room)
+        public IActionResult Update(RoomDto roomDto)
         {
-            var resultUpdate = _roomRepository.Update(room);
-            if (resultUpdate is false)
+            var entity = _roomRepository.GetByGuid(roomDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            Room toUpdate = roomDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _roomRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
-        [HttpDelete("{guid}")]
+        [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
             var result = _roomRepository.GetByGuid(guid);

@@ -1,4 +1,5 @@
 ﻿using API.Contracts;
+using API.DTO.AccountRoles;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,7 +61,7 @@ namespace API.Controllers
             return Ok(resultUpdate);
         }
         // Delete data sesuai ID dengan metode DELETE
-        [HttpDelete("{guid}")]
+        [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
             var result = _accountRoleRepository.GetByGuid(guid);

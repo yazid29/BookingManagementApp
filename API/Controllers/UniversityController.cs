@@ -1,4 +1,5 @@
 ﻿using API.Contracts;
+using API.DTO.Universities;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +28,15 @@ namespace API.Controllers
                 return NotFound("Data Not Found");
             }
 
-            return Ok(result);
+            var data = result.Select(x => (UniversityDto) x );
+
+            /*var universityDto = new List<UniversityDto>();
+            foreach (var university in result)
+            {
+                universityDto.Add((UniversityDto) university);
+            }*/
+
+            return Ok(data);
         }
 
         // tampilkan data sesuai ID dengan metode GET
@@ -39,36 +48,46 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-            return Ok(result);
+            return Ok((UniversityDto) result);
         }
 
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(University university)
+        public IActionResult Create(CreateUniversityDto universitydto)
         {
-            var result = _universityRepository.Create(university);
+            var result = _universityRepository.Create(universitydto);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
             }
 
-            return Ok(result);
+            return Ok((UniversityDto) result);
         }
 
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(University university)
+        public IActionResult Update(UniversityDto universityDto)
         {
-            var resultUpdate = _universityRepository.Update(university);
-            if (resultUpdate is false)
+            var entity = _universityRepository.GetByGuid(universityDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            University toUpdate = universityDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _universityRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
 
         // Delete data sesuai ID dengan metode DELETE
-        [HttpDelete("{guid}")]
+        [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
             var result = _universityRepository.GetByGuid(guid);

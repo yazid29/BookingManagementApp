@@ -1,4 +1,5 @@
 ﻿using API.Contracts;
+using API.DTO.Employees;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,8 +35,8 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-
-            return Ok(result);
+            var data = result.Select(item => item);
+            return Ok(data);
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -60,7 +61,7 @@ namespace API.Controllers
             return Ok(resultUpdate);
         }
         // Delete data sesuai ID dengan metode DELETE
-        [HttpDelete("{guid}")]
+        [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
             var result = _employeeRepository.GetByGuid(guid);

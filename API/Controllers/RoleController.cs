@@ -1,4 +1,6 @@
 ﻿using API.Contracts;
+using API.DTO.Roles;
+using API.DTO.Rooms;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +17,7 @@ namespace API.Controllers
         }
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(Role role)
+        public IActionResult Create(CreateRolesDto role)
         {
             var result = _roleRepository.Create(role);
             if (result is null)
@@ -23,7 +25,7 @@ namespace API.Controllers
                 return BadRequest("Failed to Create data");
             }
 
-            return Ok(result);
+            return Ok((RoleDto) result);
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -34,8 +36,8 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-
-            return Ok(result);
+            var data = result.Select(item => (RoleDto) item);
+            return Ok(data);
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -46,21 +48,32 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-            return Ok(result);
+            return Ok((RoleDto) result);
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(Role role)
+        public IActionResult Update(RoleDto roleDto)
         {
-            var resultUpdate = _roleRepository.Update(role);
-            if (resultUpdate is false)
+            var entity = _roleRepository.GetByGuid(roleDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            Role toUpdate = roleDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _roleRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
+
         // Delete data sesuai ID dengan metode DELETE
-        [HttpDelete("{guid}")]
+        [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
             var result = _roleRepository.GetByGuid(guid);
