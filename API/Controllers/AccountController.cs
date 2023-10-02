@@ -16,15 +16,15 @@ namespace API.Controllers
         }
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(Account account)
+        public IActionResult Create(CreateAccountDto accountDto)
         {
-            var result = _accountRepository.Create(account);
+            var result = _accountRepository.Create(accountDto);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data tanpa password
+            return Ok((ViewAccountDto) result);
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -35,8 +35,9 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data tanpa password
+            var data = result.Select(item => (ViewAccountDto) item);
+            return Ok(data);
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -47,18 +48,29 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data tanpa password
+            return Ok((ViewAccountDto)result);
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(Account account)
+        public IActionResult Update(AccountDto accountDto)
         {
-            var resultUpdate = _accountRepository.Update(account);
-            if (resultUpdate is false)
+            var entity = _accountRepository.GetByGuid(accountDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            Account toUpdate = accountDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _accountRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]

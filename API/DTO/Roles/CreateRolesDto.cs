@@ -1,5 +1,4 @@
-﻿using API.DTO.Rooms;
-using BookingManagementApp.Models;
+﻿using BookingManagementApp.Models;
 
 namespace API.DTO.Roles
 {
@@ -8,6 +7,8 @@ namespace API.DTO.Roles
         public string Name { get; set; }
         public static implicit operator Role(CreateRolesDto CreateDto)
         {
+            // setelah method dipanggil akan otomatis konversi isi atribut
+            // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Role
             {
                 Name = CreateDto.Name,

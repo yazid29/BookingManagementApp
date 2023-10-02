@@ -27,7 +27,7 @@ namespace API.Controllers
             {
                 return NotFound("Data Not Found");
             }
-
+            // konversi sesuai yang ada di DTO untuk mengemas data
             var data = result.Select(x => (UniversityDto) x );
 
             /*var universityDto = new List<UniversityDto>();
@@ -48,6 +48,8 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
+
+            // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok((UniversityDto) result);
         }
 
@@ -61,6 +63,7 @@ namespace API.Controllers
                 return BadRequest("Failed to Create data");
             }
 
+            // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok((UniversityDto) result);
         }
 
@@ -74,6 +77,7 @@ namespace API.Controllers
                 return NotFound("Id Not Found");
             }
 
+            // update data jika ada
             University toUpdate = universityDto;
             toUpdate.CreatedDate = entity.CreatedDate;
 

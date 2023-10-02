@@ -1,6 +1,5 @@
 ﻿using API.Contracts;
 using API.DTO.Roles;
-using API.DTO.Rooms;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +23,7 @@ namespace API.Controllers
             {
                 return BadRequest("Failed to Create data");
             }
-
+            // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok((RoleDto) result);
         }
         // tampilkan semua data dengan metode GET
@@ -36,6 +35,7 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
+            // konversi sesuai yang ada di DTO untuk mengemas data
             var data = result.Select(item => (RoleDto) item);
             return Ok(data);
         }
@@ -48,6 +48,7 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
+            // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok((RoleDto) result);
         }
         // Update data sesuai ID dengan metode PUT
@@ -59,7 +60,7 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-
+            // update data jika ada
             Role toUpdate = roleDto;
             toUpdate.CreatedDate = entity.CreatedDate;
 

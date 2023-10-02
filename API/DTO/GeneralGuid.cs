@@ -1,6 +1,6 @@
 ﻿namespace API.DTO
 {
-    public class GeneralGuid
+    public abstract class GeneralGuid
     {
         public Guid Guid { get; set; }
     }

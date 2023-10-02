@@ -1,5 +1,4 @@
-﻿using API.DTO.Roles;
-using API.Utilities.Enums;
+﻿using API.Utilities.Enums;
 using BookingManagementApp.Models;
 
 namespace API.DTO.Employees
@@ -14,8 +13,11 @@ namespace API.DTO.Employees
         public DateTime HiringDate { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+
         public static implicit operator Employee(CreateEmployeeDto CreateDto)
         {
+            // setelah method dipanggil akan otomatis konversi isi atribut
+            // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Employee
             {
                 Nik = CreateDto.Nik,

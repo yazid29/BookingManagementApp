@@ -1,19 +1,17 @@
-﻿using API.DTO.Rooms;
-using BookingManagementApp.Models;
+﻿using BookingManagementApp.Models;
 
 namespace API.DTO.Accounts
 {
-    public class CreateAccountDto 
+    public class CreateAccountDto : GeneralGuid
     {
         public string Password { get; set; }
-        //public bool IsDeleted { get; set; }
-        //public int Otp { get; set; }
-        //public bool IsUsed { get; set; }
-        public DateTime ExpiredDate { get; set; }
         public static implicit operator Account(CreateAccountDto CreateDto)
         {
+            // setelah method dipanggil akan otomatis konversi isi atribut
+            // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Account
             {
+                Guid = CreateDto.Guid,
                 Password = CreateDto.Password,
                 IsDeleted = false,
                 Otp = 1,

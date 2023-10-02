@@ -1,5 +1,4 @@
-﻿using API.DTO.Rooms;
-using BookingManagementApp.Models;
+﻿using BookingManagementApp.Models;
 
 namespace API.DTO.Educations
 {
@@ -12,6 +11,8 @@ namespace API.DTO.Educations
 
         public static implicit operator Education(CreateEducationDto CreateDto)
         {
+            // setelah method dipanggil akan otomatis konversi isi atribut
+            // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Education
             {
                 Major = CreateDto.Major,

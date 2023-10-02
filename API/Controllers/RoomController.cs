@@ -26,7 +26,7 @@ namespace API.Controllers
             {
                 return BadRequest("Failed to Create data");
             }
-
+            // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok((RoomDto) result);
         }
         // tampilkan semua data dengan metode GET
@@ -38,7 +38,7 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-
+            // konversi sesuai yang ada di DTO untuk mengemas data
             var data = result.Select(x => (RoomDto) x );
 
             return Ok(data);
@@ -52,6 +52,7 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
+            // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok((RoomDto) result);
         }
         // Update data sesuai ID dengan metode PUT
@@ -63,7 +64,7 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-
+            // update data jika ada
             Room toUpdate = roomDto;
             toUpdate.CreatedDate = entity.CreatedDate;
 

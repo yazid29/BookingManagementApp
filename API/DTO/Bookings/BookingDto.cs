@@ -1,5 +1,4 @@
-﻿using API.DTO.Roles;
-using API.Utilities.Enums;
+﻿using API.Utilities.Enums;
 using BookingManagementApp.Models;
 
 namespace API.DTO.Bookings
@@ -13,6 +12,7 @@ namespace API.DTO.Bookings
         
         public static explicit operator BookingDto(Booking booking)
         {
+            // atribut yang ingin ditampilkan dan diisi oleh User
             return new BookingDto
             {
                 Guid = booking.Guid,

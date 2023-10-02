@@ -4,12 +4,13 @@ namespace API.DTO.Universities
 {
     public class UniversityDto : GeneralGuid
     {
-        //public System.Guid Guid { get; set; }
+        // atribut yang ingin ditampilkan ke User
         public string Code { get; set; }
         public string Name { get; set; }
 
         public static explicit operator UniversityDto(University university)
         {
+            // atribut yang ingin ditampilkan dan diisi oleh User
             return new UniversityDto
             {
                 Guid = university.Guid,
@@ -20,6 +21,7 @@ namespace API.DTO.Universities
 
         public static implicit operator University(UniversityDto universityDto)
         {
+            // konversi DTO ke Model University agar dapat diproses oleh Repository-Model
             return new University
             {
                 Guid = universityDto.Guid,

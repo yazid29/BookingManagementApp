@@ -16,15 +16,15 @@ namespace API.Controllers
         }
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(AccountRole accountRole)
+        public IActionResult Create(CreateAccountRolesDto accountRoleDto)
         {
-            var result = _accountRoleRepository.Create(accountRole);
+            var result = _accountRoleRepository.Create(accountRoleDto);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            return Ok((AccountRoleDto) result);
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -35,8 +35,9 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            var data = result.Select(item => (AccountRoleDto) item);
+            return Ok(data);
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -47,18 +48,29 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            return Ok((AccountRoleDto)result);
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(AccountRole accountRole)
+        public IActionResult Update(AccountRoleDto accountRoleDto)
         {
-            var resultUpdate = _accountRoleRepository.Update(accountRole);
-            if (resultUpdate is false)
+            var entity = _accountRoleRepository.GetByGuid(accountRoleDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            AccountRole toUpdate = accountRoleDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _accountRoleRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]

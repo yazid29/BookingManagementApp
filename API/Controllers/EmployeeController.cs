@@ -16,15 +16,15 @@ namespace API.Controllers
         }
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(Employee employee)
+        public IActionResult Create(CreateEmployeeDto employeeDto)
         {
-            var result = _employeeRepository.Create(employee);
+            var result = _employeeRepository.Create(employeeDto);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            return Ok((EmployeeDto) result);
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -35,7 +35,8 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-            var data = result.Select(item => item);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            var data = result.Select(item => (EmployeeDto) item);
             return Ok(data);
         }
         // tampilkan data sesuai ID dengan metode GET
@@ -47,18 +48,29 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            return Ok((EmployeeDto)result);
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(Employee employee)
+        public IActionResult Update(EmployeeDto employeeDto)
         {
-            var resultUpdate = _employeeRepository.Update(employee);
-            if (resultUpdate is false)
+            var entity = _employeeRepository.GetByGuid(employeeDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            Employee toUpdate = employeeDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _employeeRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]

@@ -1,5 +1,4 @@
-﻿using API.DTO.Universities;
-using BookingManagementApp.Models;
+﻿using BookingManagementApp.Models;
 
 namespace API.DTO.Rooms
 {
@@ -11,6 +10,8 @@ namespace API.DTO.Rooms
 
         public static implicit operator Room(CreateRoomDto CreateDto)
         {
+            // setelah method dipanggil akan otomatis konversi isi atribut
+            // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Room
             {
                 Name = CreateDto.Name,

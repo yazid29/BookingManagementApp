@@ -1,5 +1,4 @@
-﻿using API.DTO.Universities;
-using BookingManagementApp.Models;
+﻿using BookingManagementApp.Models;
 
 namespace API.DTO.Educations
 {
@@ -11,6 +10,7 @@ namespace API.DTO.Educations
         public Guid UniversityGuid { get; set; }
         public static explicit operator EducationDto(Education education)
         {
+            // atribut yang ingin ditampilkan dan diisi oleh User
             return new EducationDto
             {
                 Guid = education.Guid,

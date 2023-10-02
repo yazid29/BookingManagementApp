@@ -16,15 +16,15 @@ namespace API.Controllers
         }
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(Education edu)
+        public IActionResult Create(CreateEducationDto eduDto)
         {
-            var result = _educationRepository.Create(edu);
+            var result = _educationRepository.Create(eduDto);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            return Ok((EducationDto) result);
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -35,8 +35,9 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            var data = result.Select(item => (EducationDto) item);
+            return Ok(data);
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -47,18 +48,29 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            return Ok((EducationDto)result);
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(Education edu)
+        public IActionResult Update(EducationDto eduDto)
         {
-            var resultUpdate = _educationRepository.Update(edu);
-            if (resultUpdate is false)
+            var entity = _educationRepository.GetByGuid(eduDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            Education toUpdate = eduDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _educationRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]

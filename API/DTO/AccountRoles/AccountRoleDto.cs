@@ -1,5 +1,4 @@
 ﻿
-using API.DTO.Accounts;
 using BookingManagementApp.Models;
 
 namespace API.DTO.AccountRoles

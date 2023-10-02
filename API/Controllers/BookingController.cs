@@ -16,15 +16,15 @@ namespace API.Controllers
         }
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
-        public IActionResult Create(Booking booking)
+        public IActionResult Create(CreateBookingDto bookingDto)
         {
-            var result = _bookingRepository.Create(booking);
+            var result = _bookingRepository.Create(bookingDto);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            return Ok((BookingDto) result);
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -35,8 +35,9 @@ namespace API.Controllers
             {
                 return BadRequest("Data not Found");
             }
-
-            return Ok(result);
+            // konversi sesuai yang ada di DTO untuk mengemas data
+            var data = result.Select(item => (BookingDto) item);
+            return Ok((BookingDto)result);
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -47,18 +48,29 @@ namespace API.Controllers
             {
                 return NotFound("Id Not Found");
             }
+            // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok(result);
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
-        public IActionResult Update(Booking booking)
+        public IActionResult Update(BookingDto bookingDto)
         {
-            var resultUpdate = _bookingRepository.Update(booking);
-            if (resultUpdate is false)
+            var entity = _bookingRepository.GetByGuid(bookingDto.Guid);
+            if (entity is null)
             {
-                return BadRequest("Failed to Update data");
+                return NotFound("Id Not Found");
             }
-            return Ok(resultUpdate);
+
+            Booking toUpdate = bookingDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _bookingRepository.Update(toUpdate);
+            if (!result)
+            {
+                return BadRequest("Failed to update data");
+            }
+
+            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
