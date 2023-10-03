@@ -1,5 +1,6 @@
 ﻿using API.Contracts;
 using API.DTO.Accounts;
+using API.Utilities.Hashing;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,9 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Create(CreateAccountDto accountDto)
         {
-            var result = _accountRepository.Create(accountDto);
+            Account newAccount = accountDto;
+            newAccount.Password = HashingHandler.HashPassword(accountDto.Password);
+            var result = _accountRepository.Create(newAccount);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
@@ -63,7 +66,7 @@ namespace API.Controllers
 
             Account toUpdate = accountDto;
             toUpdate.CreatedDate = entity.CreatedDate;
-
+            toUpdate.Password = HashingHandler.HashPassword(accountDto.Password);
             var result = _accountRepository.Update(toUpdate);
             if (!result)
             {

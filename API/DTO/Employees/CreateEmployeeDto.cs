@@ -5,7 +5,6 @@ namespace API.DTO.Employees
 {
     public class CreateEmployeeDto 
     {
-        public string Nik { get; set; }
         public string FirstName { get; set; }
         public string? LastName { get; set; }
         public DateTime BirthDate { get; set; }
@@ -20,7 +19,6 @@ namespace API.DTO.Employees
             // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Employee
             {
-                Nik = CreateDto.Nik,
                 FirstName = CreateDto.FirstName,
                 LastName = CreateDto.LastName,
                 BirthDate = CreateDto.BirthDate,

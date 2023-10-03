@@ -1,5 +1,6 @@
 ﻿using API.Contracts;
 using API.DTO.Employees;
+using API.Utilities.Handler;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,10 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Create(CreateEmployeeDto employeeDto)
         {
-            var result = _employeeRepository.Create(employeeDto);
+            // generate NIK melalui generateHandler
+            Employee toCreate = employeeDto;
+            toCreate.Nik = GenerateHandler.GenerateNik(_employeeRepository.GetLastNik());
+            var result = _employeeRepository.Create(toCreate);
             if (result is null)
             {
                 return BadRequest("Failed to Create data");
