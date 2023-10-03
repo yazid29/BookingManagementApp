@@ -1,7 +1,10 @@
 ﻿using API.Contracts;
 using API.DTO.Rooms;
+using API.DTO.Universities;
+using API.Utilities.Handler;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API.Controllers
 {
@@ -21,27 +24,45 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Create(CreateRoomDto roomDto)
         {
-            var result = _roomRepository.Create(roomDto);
-            if (result is null)
+            try
             {
-                return BadRequest("Failed to Create data");
+                var result = _roomRepository.Create(roomDto);
+                // konversi sesuai yang ada di DTO untuk mengemas data
+                return Ok(new ResponseOKHandler<RoomDto>((RoomDto)result));
             }
-            // konversi sesuai yang ada di DTO untuk mengemas data
-            return Ok((RoomDto) result);
+            catch (ExceptionHandler ex)
+            {
+                // message error jika gagal Insert into DB
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
+            }
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
         public IActionResult GetAll()
         {
+
             var result = _roomRepository.GetAll();
             if (!result.Any())
             {
-                return BadRequest("Data not Found");
+                //return BadRequest("Data not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data
-            var data = result.Select(x => (RoomDto) x );
+            var data = result.Select(x => (RoomDto)x);
 
-            return Ok(data);
+            //return Ok(data);
+            return Ok(new ResponseOKHandler<IEnumerable<RoomDto>>(data));
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -50,47 +71,87 @@ namespace API.Controllers
             var result = _roomRepository.GetByGuid(guid);
             if (result is null)
             {
-                return NotFound("Id Not Found");
+                //return NotFound("Id Not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data
-            return Ok((RoomDto) result);
+            //return Ok((EmployeeDto)result);
+            return Ok(new ResponseOKHandler<RoomDto>((RoomDto)result));
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
         public IActionResult Update(RoomDto roomDto)
         {
-            var entity = _roomRepository.GetByGuid(roomDto.Guid);
-            if (entity is null)
+            try
             {
-                return NotFound("Id Not Found");
-            }
-            // update data jika ada
-            Room toUpdate = roomDto;
-            toUpdate.CreatedDate = entity.CreatedDate;
+                var entity = _roomRepository.GetByGuid(roomDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
 
-            var result = _roomRepository.Update(toUpdate);
-            if (!result)
+                // update data jika ada
+                Room toUpdate = roomDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+
+                _roomRepository.Update(toUpdate);
+
+                return Ok(new ResponseOKHandler<string>("Data Updated"));
+            }
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to update data");
+                // message error jika gagal update
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to update data",
+                    Error = ex.Message
+                });
             }
-
-            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
-            var result = _roomRepository.GetByGuid(guid);
-            if (result is null)
+            try
             {
-                return NotFound("Id Not Found");
+                var result = _roomRepository.GetByGuid(guid);
+                if (result is null)
+                {
+                    //return NotFound("Id Not Found");
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
+                _roomRepository.Delete(result);
+                //return Ok(delete);
+                return Ok(new ResponseOKHandler<string>("Data Deleted"));
             }
-            var delete = _roomRepository.Delete(result);
-            if (delete is false)
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to Delete data");
+                // message error jika gagal delete data
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
             }
-            return Ok(delete);
         }
     }
 }

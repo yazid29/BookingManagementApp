@@ -2,7 +2,7 @@
 
 namespace API.DTO.Educations
 {
-    public class CreateEducationDto 
+    public class CreateEducationDto : GeneralGuid
     {
         public string Major { get; set; }
         public string Degree { get; set; }
@@ -15,6 +15,7 @@ namespace API.DTO.Educations
             // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Education
             {
+                Guid = CreateDto.Guid,
                 Major = CreateDto.Major,
                 Degree = CreateDto.Degree,
                 Gpa = CreateDto.Gpa,

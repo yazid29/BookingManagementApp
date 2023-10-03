@@ -11,6 +11,7 @@ namespace API.DTO.Roles
             // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Role
             {
+                Guid = new Guid(),
                 Name = CreateDto.Name,
                 CreatedDate = DateTime.Now,
                 ModifiedDate = DateTime.Now

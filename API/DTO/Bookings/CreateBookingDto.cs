@@ -15,6 +15,7 @@ namespace API.DTO.Bookings
             // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Booking
             {
+                Guid = new Guid(),
                 StartDate = CreateDto.StartDate,
                 EndDate = CreateDto.EndDate,
                 Status = CreateDto.Status,

@@ -14,6 +14,7 @@ namespace API.DTO.Rooms
             // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Room
             {
+                Guid = new Guid(),
                 Name = CreateDto.Name,
                 Floor = CreateDto.Floor,
                 Capacity = CreateDto.Capacity,

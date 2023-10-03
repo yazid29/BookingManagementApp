@@ -1,8 +1,13 @@
 ﻿using API.Contracts;
+using API.DTO.AccountRoles;
 using API.DTO.Accounts;
+using API.Utilities.Handler;
 using API.Utilities.Hashing;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Net;
 
 namespace API.Controllers
 {
@@ -19,15 +24,25 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Create(CreateAccountDto accountDto)
         {
-            Account newAccount = accountDto;
-            newAccount.Password = HashingHandler.HashPassword(accountDto.Password);
-            var result = _accountRepository.Create(newAccount);
-            if (result is null)
+            try
             {
-                return BadRequest("Failed to Create data");
+                Account newAccount = accountDto;
+                newAccount.Password = HashingHandler.HashPassword(accountDto.Password);
+                var result = _accountRepository.Create(newAccount);
+                // konversi sesuai yang ada di DTO untuk mengemas data
+                return Ok(new ResponseOKHandler<ViewAccountDto>((ViewAccountDto)result));
             }
-            // konversi sesuai yang ada di DTO untuk mengemas data tanpa password
-            return Ok((ViewAccountDto) result);
+            catch (ExceptionHandler ex)
+            {
+                // message error jika gagal Insert into DB
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
+            }
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -36,11 +51,17 @@ namespace API.Controllers
             var result = _accountRepository.GetAll();
             if (!result.Any())
             {
-                return BadRequest("Data not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data tanpa password
             var data = result.Select(item => (ViewAccountDto) item);
-            return Ok(data);
+            //return Ok(data);
+            return Ok(new ResponseOKHandler<IEnumerable<ViewAccountDto>>(data));
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -49,47 +70,84 @@ namespace API.Controllers
             var result = _accountRepository.GetByGuid(guid);
             if (result is null)
             {
-                return NotFound("Id Not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data tanpa password
-            return Ok((ViewAccountDto)result);
+            return Ok(new ResponseOKHandler<ViewAccountDto>((ViewAccountDto)result));
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
         public IActionResult Update(AccountDto accountDto)
         {
-            var entity = _accountRepository.GetByGuid(accountDto.Guid);
-            if (entity is null)
+            try
             {
-                return NotFound("Id Not Found");
-            }
+                var entity = _accountRepository.GetByGuid(accountDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
 
-            Account toUpdate = accountDto;
-            toUpdate.CreatedDate = entity.CreatedDate;
-            toUpdate.Password = HashingHandler.HashPassword(accountDto.Password);
-            var result = _accountRepository.Update(toUpdate);
-            if (!result)
+                Account toUpdate = accountDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+                toUpdate.Password = HashingHandler.HashPassword(accountDto.Password);
+                _accountRepository.Update(toUpdate);
+
+                return Ok(new ResponseOKHandler<string>("Data Updated"));
+            }
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to update data");
+                // message error jika gagal update
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to update data",
+                    Error = ex.Message
+                });
             }
-
-            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
-            var result = _accountRepository.GetByGuid(guid);
-            if (result is null)
+            try
             {
-                return NotFound("Id Not Found");
+                var result = _accountRepository.GetByGuid(guid);
+                if (result is null)
+                {
+                    //return NotFound("Id Not Found");
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
+                _accountRepository.Delete(result);
+                //return Ok(delete);
+                return Ok(new ResponseOKHandler<string>("Data Deleted"));
             }
-            var delete = _accountRepository.Delete(result);
-            if (delete is false)
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to Delete data");
+                // message error jika gagal delete data
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
             }
-            return Ok(delete);
         }
     }
 }

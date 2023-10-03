@@ -19,6 +19,7 @@ namespace API.DTO.Employees
             // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new Employee
             {
+                Guid = new Guid(),
                 FirstName = CreateDto.FirstName,
                 LastName = CreateDto.LastName,
                 BirthDate = CreateDto.BirthDate,

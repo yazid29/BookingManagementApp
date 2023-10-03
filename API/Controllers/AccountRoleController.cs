@@ -1,8 +1,12 @@
 ﻿using API.Contracts;
 using API.DTO.AccountRoles;
+using API.DTO.Rooms;
+using API.Utilities.Handler;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Data;
+using System.Net;
 namespace API.Controllers
 {
     [ApiController]
@@ -18,13 +22,23 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Create(CreateAccountRolesDto accountRoleDto)
         {
-            var result = _accountRoleRepository.Create(accountRoleDto);
-            if (result is null)
+            try
             {
-                return BadRequest("Failed to Create data");
+                var result = _accountRoleRepository.Create(accountRoleDto);
+                // konversi sesuai yang ada di DTO untuk mengemas data
+                return Ok(new ResponseOKHandler<AccountRoleDto>((AccountRoleDto)result));
             }
-            // konversi sesuai yang ada di DTO untuk mengemas data
-            return Ok((AccountRoleDto) result);
+            catch (ExceptionHandler ex)
+            {
+                // message error jika gagal Insert into DB
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
+            }
         }
         // tampilkan semua data dengan metode GET
         [HttpGet]
@@ -33,11 +47,17 @@ namespace API.Controllers
             var result = _accountRoleRepository.GetAll();
             if (!result.Any())
             {
-                return BadRequest("Data not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data
             var data = result.Select(item => (AccountRoleDto) item);
-            return Ok(data);
+            //return Ok(data);
+            return Ok(new ResponseOKHandler<IEnumerable<AccountRoleDto>>(data));
         }
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
@@ -46,47 +66,86 @@ namespace API.Controllers
             var result = _accountRoleRepository.GetByGuid(guid);
             if (result is null)
             {
-                return NotFound("Id Not Found");
+                //return NotFound("Id Not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code= StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data
-            return Ok((AccountRoleDto)result);
+            //return Ok((AccountRoleDto)result);
+            return Ok(new ResponseOKHandler<AccountRole>((AccountRoleDto)result));
         }
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
         public IActionResult Update(AccountRoleDto accountRoleDto)
         {
-            var entity = _accountRoleRepository.GetByGuid(accountRoleDto.Guid);
-            if (entity is null)
+            try
             {
-                return NotFound("Id Not Found");
+                var entity = _accountRoleRepository.GetByGuid(accountRoleDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
+
+                AccountRole toUpdate = accountRoleDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+
+                _accountRoleRepository.Update(toUpdate);
+
+                return Ok(new ResponseOKHandler<string>("Data Updated"));
             }
-
-            AccountRole toUpdate = accountRoleDto;
-            toUpdate.CreatedDate = entity.CreatedDate;
-
-            var result = _accountRoleRepository.Update(toUpdate);
-            if (!result)
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to update data");
+                // message error jika gagal update
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to update data",
+                    Error = ex.Message
+                });
             }
-
-            return Ok("Data Updated");
         }
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
-            var result = _accountRoleRepository.GetByGuid(guid);
-            if (result is null)
+            try
             {
-                return NotFound("Id Not Found");
+                var result = _accountRoleRepository.GetByGuid(guid);
+                if (result is null)
+                {
+                    //return NotFound("Id Not Found");
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
+                _accountRoleRepository.Delete(result);
+                //return Ok(delete);
+                return Ok(new ResponseOKHandler<string>("Data Deleted"));
             }
-            var delete = _accountRoleRepository.Delete(result);
-            if (delete is false)
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to Delete data");
+                // message error jika gagal delete data
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
             }
-            return Ok(delete);
         }
     }
 }

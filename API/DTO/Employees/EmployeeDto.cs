@@ -6,6 +6,7 @@ namespace API.DTO.Employees
     public class EmployeeDto : GeneralGuid
     {
         // atribut yang ingin ditampilkan ke User
+        public Guid Guid { get; set; }
         public string Nik { get; set; }
         public string FirstName { get; set; }
         public string? LastName { get; set; }

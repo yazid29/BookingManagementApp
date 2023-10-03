@@ -1,7 +1,10 @@
 ﻿using API.Contracts;
+using API.DTO.Employees;
 using API.DTO.Universities;
+using API.Utilities.Handler;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API.Controllers
 {
@@ -25,18 +28,19 @@ namespace API.Controllers
             var result = _universityRepository.GetAll();
             if (!result.Any())
             {
-                return NotFound("Data Not Found");
+                //return BadRequest("Data not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data
-            var data = result.Select(x => (UniversityDto) x );
+            var data = result.Select(x => (UniversityDto)x);
 
-            /*var universityDto = new List<UniversityDto>();
-            foreach (var university in result)
-            {
-                universityDto.Add((UniversityDto) university);
-            }*/
-
-            return Ok(data);
+            //return Ok(data);
+            return Ok(new ResponseOKHandler<IEnumerable<UniversityDto>>(data));
         }
 
         // tampilkan data sesuai ID dengan metode GET
@@ -46,65 +50,111 @@ namespace API.Controllers
             var result = _universityRepository.GetByGuid(guid);
             if (result is null)
             {
-                return NotFound("Id Not Found");
+                //return NotFound("Id Not Found");
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
+                });
             }
-
             // konversi sesuai yang ada di DTO untuk mengemas data
-            return Ok((UniversityDto) result);
+            //return Ok((EmployeeDto)result);
+            return Ok(new ResponseOKHandler<UniversityDto>((UniversityDto)result));
         }
 
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
         public IActionResult Create(CreateUniversityDto universitydto)
         {
-            var result = _universityRepository.Create(universitydto);
-            if (result is null)
+            try
             {
-                return BadRequest("Failed to Create data");
+                var result = _universityRepository.Create(universitydto);
+                // konversi sesuai yang ada di DTO untuk mengemas data
+                return Ok(new ResponseOKHandler<UniversityDto>((UniversityDto)result));
             }
-
-            // konversi sesuai yang ada di DTO untuk mengemas data
-            return Ok((UniversityDto) result);
+            catch (ExceptionHandler ex)
+            {
+                // message error jika gagal Insert into DB
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
+            }
         }
 
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
         public IActionResult Update(UniversityDto universityDto)
         {
-            var entity = _universityRepository.GetByGuid(universityDto.Guid);
-            if (entity is null)
+            try
             {
-                return NotFound("Id Not Found");
+                var entity = _universityRepository.GetByGuid(universityDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
+
+                University toUpdate = universityDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+
+                _universityRepository.Update(toUpdate);
+
+                return Ok(new ResponseOKHandler<string>("Data Updated"));
             }
-
-            // update data jika ada
-            University toUpdate = universityDto;
-            toUpdate.CreatedDate = entity.CreatedDate;
-
-            var result = _universityRepository.Update(toUpdate);
-            if (!result)
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to update data");
+                // message error jika gagal update
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to update data",
+                    Error = ex.Message
+                });
             }
-
-            return Ok("Data Updated");
         }
 
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
-            var result = _universityRepository.GetByGuid(guid);
-            if (result is null)
+            try
             {
-                return NotFound("Id Not Found");
+                var result = _universityRepository.GetByGuid(guid);
+                if (result is null)
+                {
+                    //return NotFound("Id Not Found");
+                    return NotFound(new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "Data Not Found"
+                    });
+                }
+                _universityRepository.Delete(result);
+                //return Ok(delete);
+                return Ok(new ResponseOKHandler<string>("Data Deleted"));
             }
-            var delete = _universityRepository.Delete(result);
-            if (delete is false)
+            catch (ExceptionHandler ex)
             {
-                return BadRequest("Failed to Delete data");
+                // message error jika gagal delete data
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = ex.Message
+                });
             }
-            return Ok(delete);
         }
     }
 }
