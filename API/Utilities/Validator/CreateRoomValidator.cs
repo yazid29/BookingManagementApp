@@ -5,6 +5,8 @@ namespace API.Utilities.Validator
 {
     public class CreateRoomValidator : AbstractValidator<CreateRoomDto>
     {
+        // add rule validation setiap field input
+        // setiap field memiliki validation yang berbeda
         public CreateRoomValidator() {
             RuleFor(e => e.Name)
                .NotEmpty().WithMessage("NameRoom harus diisi.")

@@ -5,7 +5,8 @@ namespace API.Utilities.Validator
 {
     public class CreateUniversityValidator : AbstractValidator<CreateUniversityDto>
     {
-        
+        // add rule validation setiap field input
+        // setiap field memiliki validation yang berbeda
         public CreateUniversityValidator()
         {
             RuleFor(e => e.Code)

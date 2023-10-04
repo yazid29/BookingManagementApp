@@ -5,6 +5,8 @@ namespace API.Utilities.Validator
 {
     public class CreateAccountValidator : AbstractValidator<CreateAccountDto>
     {
+        // add rule validation setiap field input
+        // setiap field memiliki validation yang berbeda
         public CreateAccountValidator() {
             RuleFor(e => e.Guid)
                .NotEmpty().WithMessage("Guid Booking harus diisi");

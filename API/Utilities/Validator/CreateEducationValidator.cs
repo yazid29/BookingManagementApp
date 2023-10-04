@@ -5,6 +5,8 @@ namespace API.Utilities.Validator
 {
     public class CreateEducationValidator : AbstractValidator<CreateEducationDto>
     {
+        // add rule validation setiap field input
+        // setiap field memiliki validation yang berbeda
         public CreateEducationValidator() {
             RuleFor(e => e.Major)
                .NotEmpty().WithMessage("Major harus diisi.")

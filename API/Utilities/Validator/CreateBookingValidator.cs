@@ -6,6 +6,8 @@ namespace API.Utilities.Validator
 {
     public class CreateBookingValidator : AbstractValidator<CreateBookingDto>
     {
+        // add rule validation setiap field input
+        // setiap field memiliki validation yang berbeda
         public CreateBookingValidator() {
             RuleFor(e => e.StartDate)
                .NotEmpty().WithMessage("StartDate Booking harus diisi")

@@ -6,6 +6,8 @@ namespace API.Utilities.Validator
 {
     public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeDto>
     {
+        // add rule validation setiap field input
+        // setiap field memiliki validation yang berbeda
         public CreateEmployeeValidator()
         {
             RuleFor(e => e.FirstName)
