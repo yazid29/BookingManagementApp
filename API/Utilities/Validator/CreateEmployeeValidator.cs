@@ -40,7 +40,7 @@ namespace API.Utilities.Validator
                 .NotEmpty().WithMessage("Tidak Boleh Kosong")
                 .MinimumLength(10).WithMessage("PhoneNumber minimal 10 karakter")
                 .MaximumLength(20).WithMessage("PhoneNumber Tidak dapat menampung lebih dari 20 karakter")
-                .Matches(@"^\d$").WithMessage("PhoneNumber harus terdiri dari digit angka");
+                .Matches("^[0-9]*$").WithMessage("PhoneNumber harus terdiri dari digit angka");
         }
     }
 }
