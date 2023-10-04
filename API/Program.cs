@@ -13,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionStrings = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<BookingManagementDBContext>(options => options.UseSqlServer(connectionStrings));
+builder.Services.AddDbContext<BookingManagementDBContext>(
+    options => options.UseSqlServer(connectionStrings), ServiceLifetime.Transient);
 // Add repositories to the container.
 builder.Services.AddScoped<IAccountRepository, AccountRepos>();
 builder.Services.AddScoped<IAccountRoleRepository, AccountRoleRepos>();

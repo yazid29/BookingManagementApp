@@ -4,7 +4,7 @@ namespace API.Contracts
 {
     public interface IEmployeeRepository : IGeneralRepos<Employee>
     {
-        Employee GetLastNik();
+        string? GetLastNik();
         /*
         IEnumerable<Employee> GetAll();
         Employee? GetByGuid(Guid guid);

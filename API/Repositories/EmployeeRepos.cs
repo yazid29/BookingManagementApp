@@ -13,11 +13,10 @@ namespace API.Repositories
             _contextEmp = context;
         }
 
-        Employee IEmployeeRepository.GetLastNik()
+        string? IEmployeeRepository.GetLastNik()
         {
             var getlast = _contextEmp.Set<Employee>().
-                OrderBy(nik => nik.Nik).Last();
-            _contextEmp.ChangeTracker.Clear();
+                OrderBy(nik => nik.Nik).LastOrDefault()?.Nik;
             return getlast;
         }
     }

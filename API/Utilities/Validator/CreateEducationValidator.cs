@@ -8,6 +8,8 @@ namespace API.Utilities.Validator
         // add rule validation setiap field input
         // setiap field memiliki validation yang berbeda
         public CreateEducationValidator() {
+            RuleFor(e => e.Guid)
+               .NotEmpty().WithMessage("Guid harus diisi");
             RuleFor(e => e.Major)
                .NotEmpty().WithMessage("Major harus diisi.")
                .MaximumLength(100).WithMessage("Major tidak dapat menampung lebih dari 100")

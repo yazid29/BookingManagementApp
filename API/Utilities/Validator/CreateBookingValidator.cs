@@ -11,11 +11,11 @@ namespace API.Utilities.Validator
         public CreateBookingValidator() {
             RuleFor(e => e.StartDate)
                .NotEmpty().WithMessage("StartDate Booking harus diisi")
-               .Must(date => date>=DateTime.Today).WithMessage("Tanggal perekrutan tidak valid");
+               .Must(date => date>=DateTime.Now).WithMessage("Tanggal StartDate Booking tidak valid");
 
             RuleFor(e => e.EndDate)
                .NotEmpty().WithMessage("EndDate Booking harus diisi")
-               .GreaterThanOrEqualTo(e => e.StartDate).WithMessage("Tanggal perekrutan tidak valid");
+               .GreaterThan(DateTime.Now).WithMessage("Tanggal EndDate Booking tidak valid");
 
             RuleFor(e => e.Status)
                .NotEmpty().WithMessage("Status Booking harus diisi")

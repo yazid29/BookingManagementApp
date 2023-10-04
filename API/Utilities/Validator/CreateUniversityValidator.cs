@@ -14,9 +14,9 @@ namespace API.Utilities.Validator
                .MaximumLength(50).WithMessage("Code University tidak dapat menampung lebih dari 50 karakter");
 
             RuleFor(e => e.Name)
-               .NotEmpty().WithMessage("Name harus diisi.")
-               .Matches("^[a-zA-Z\\s]*$").WithMessage("Name hanya boleh berisi huruf dan spasi.")
-               .MaximumLength(100).WithMessage("Name tidak dapat menampung lebih dari 100 karakter");
+               .NotEmpty().WithMessage("Name University harus diisi.")
+               .Matches("^[a-zA-Z\\s]*$").WithMessage("Name University hanya boleh berisi huruf dan spasi.")
+               .MaximumLength(100).WithMessage("Name University tidak dapat menampung lebih dari 100 karakter");
         }
     }
 }

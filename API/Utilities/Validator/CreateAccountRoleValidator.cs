@@ -9,10 +9,10 @@ namespace API.Utilities.Validator
         // setiap field memiliki validation yang berbeda
         public CreateAccountRoleValidator() {
             RuleFor(e => e.AccountGuid)
-                .NotEmpty().WithMessage("Major harus diisi");
+                .NotEmpty().WithMessage("AccountGuid harus diisi");
 
             RuleFor(e => e.RoleGuid)
-                .NotEmpty().WithMessage("Major harus diisi");
+                .NotEmpty().WithMessage("RoleGuid harus diisi");
         }
     }
 }
