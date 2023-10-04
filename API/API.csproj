@@ -7,8 +7,44 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Utilities\Validator\AccountRole\**" />
+    <Compile Remove="Utilities\Validator\Account\**" />
+    <Compile Remove="Utilities\Validator\Booking\**" />
+    <Compile Remove="Utilities\Validator\Education\**" />
+    <Compile Remove="Utilities\Validator\Employees\**" />
+    <Compile Remove="Utilities\Validator\Role\**" />
+    <Compile Remove="Utilities\Validator\Room\**" />
+    <Compile Remove="Utilities\Validator\University\**" />
+    <Content Remove="Utilities\Validator\AccountRole\**" />
+    <Content Remove="Utilities\Validator\Account\**" />
+    <Content Remove="Utilities\Validator\Booking\**" />
+    <Content Remove="Utilities\Validator\Education\**" />
+    <Content Remove="Utilities\Validator\Employees\**" />
+    <Content Remove="Utilities\Validator\Role\**" />
+    <Content Remove="Utilities\Validator\Room\**" />
+    <Content Remove="Utilities\Validator\University\**" />
+    <EmbeddedResource Remove="Utilities\Validator\AccountRole\**" />
+    <EmbeddedResource Remove="Utilities\Validator\Account\**" />
+    <EmbeddedResource Remove="Utilities\Validator\Booking\**" />
+    <EmbeddedResource Remove="Utilities\Validator\Education\**" />
+    <EmbeddedResource Remove="Utilities\Validator\Employees\**" />
+    <EmbeddedResource Remove="Utilities\Validator\Role\**" />
+    <EmbeddedResource Remove="Utilities\Validator\Room\**" />
+    <EmbeddedResource Remove="Utilities\Validator\University\**" />
+    <None Remove="Utilities\Validator\AccountRole\**" />
+    <None Remove="Utilities\Validator\Account\**" />
+    <None Remove="Utilities\Validator\Booking\**" />
+    <None Remove="Utilities\Validator\Education\**" />
+    <None Remove="Utilities\Validator\Employees\**" />
+    <None Remove="Utilities\Validator\Role\**" />
+    <None Remove="Utilities\Validator\Room\**" />
+    <None Remove="Utilities\Validator\University\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.11" />
