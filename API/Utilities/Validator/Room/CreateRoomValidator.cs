@@ -1,13 +1,14 @@
 ﻿using API.DTO.Rooms;
 using FluentValidation;
 
-namespace API.Utilities.Validator
+namespace API.Utilities.Validator.Room
 {
     public class CreateRoomValidator : AbstractValidator<CreateRoomDto>
     {
         // add rule validation setiap field input
         // setiap field memiliki validation yang berbeda
-        public CreateRoomValidator() {
+        public CreateRoomValidator()
+        {
             RuleFor(e => e.Name)
                .NotEmpty().WithMessage("NameRoom harus diisi.")
                .MaximumLength(100).WithMessage("NameRoom tidak dapat menampung lebih dari 100 karakter");

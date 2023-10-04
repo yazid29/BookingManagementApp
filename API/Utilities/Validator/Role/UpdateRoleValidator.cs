@@ -1,14 +1,17 @@
 ﻿using API.DTO.Roles;
 using FluentValidation;
 
-namespace API.Utilities.Validator
+namespace API.Utilities.Validator.Role
 {
-    public class CreateRoleValidator : AbstractValidator<CreateRolesDto>
+    public class UpdateRoleValidator : AbstractValidator<RoleDto>
     {
         // add rule validation setiap field input
         // setiap field memiliki validation yang berbeda
-        public CreateRoleValidator()
+        public UpdateRoleValidator()
         {
+            RuleFor(e => e.Guid)
+               .NotEmpty().WithMessage("Guid harus diisi");
+
             RuleFor(e => e.Name)
                .NotEmpty().WithMessage("NameRole harus diisi.")
                .MaximumLength(100).WithMessage("NameRole tidak dapat menampung lebih dari 100 karakter")

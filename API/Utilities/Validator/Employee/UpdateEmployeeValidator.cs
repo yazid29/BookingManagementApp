@@ -2,14 +2,17 @@
 using FluentValidation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace API.Utilities.Validator
+namespace API.Utilities.Validator.Employee
 {
-    public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeDto>
+    public class UpdateEmployeeValidator : AbstractValidator<EmployeeDto>
     {
         // add rule validation setiap field input
         // setiap field memiliki validation yang berbeda
-        public CreateEmployeeValidator()
+        public UpdateEmployeeValidator()
         {
+            RuleFor(e => e.Guid)
+               .NotEmpty().WithMessage("Guid harus diisi");
+
             RuleFor(e => e.FirstName)
                 .NotEmpty().WithMessage("FirstName harus diisi.")
                 .Matches("^[a-zA-Z\\s]*$").WithMessage("FirstName hanya boleh berisi huruf dan spasi.")

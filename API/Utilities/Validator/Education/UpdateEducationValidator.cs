@@ -1,13 +1,14 @@
 ﻿using API.DTO.Educations;
 using FluentValidation;
 
-namespace API.Utilities.Validator
+namespace API.Utilities.Validator.Education
 {
-    public class CreateEducationValidator : AbstractValidator<CreateEducationDto>
+    public class UpdateEducationValidator : AbstractValidator<EducationDto>
     {
         // add rule validation setiap field input
         // setiap field memiliki validation yang berbeda
-        public CreateEducationValidator() {
+        public UpdateEducationValidator()
+        {
             RuleFor(e => e.Guid)
                .NotEmpty().WithMessage("Guid harus diisi");
             RuleFor(e => e.Major)

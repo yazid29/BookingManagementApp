@@ -2,16 +2,17 @@
 using API.Utilities.Enums;
 using FluentValidation;
 
-namespace API.Utilities.Validator
+namespace API.Utilities.Validator.Booking
 {
     public class CreateBookingValidator : AbstractValidator<CreateBookingDto>
     {
         // add rule validation setiap field input
         // setiap field memiliki validation yang berbeda
-        public CreateBookingValidator() {
+        public CreateBookingValidator()
+        {
             RuleFor(e => e.StartDate)
                .NotEmpty().WithMessage("StartDate Booking harus diisi")
-               .Must(date => date>=DateTime.Now).WithMessage("Tanggal StartDate Booking tidak valid");
+               .Must(date => date >= DateTime.Now).WithMessage("Tanggal StartDate Booking tidak valid");
 
             RuleFor(e => e.EndDate)
                .NotEmpty().WithMessage("EndDate Booking harus diisi")
