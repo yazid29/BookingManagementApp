@@ -9,6 +9,8 @@ namespace API.DTO.Accounts
         public string Password { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsUsed { get; set; }
+        public int Otp { get; set; }
+        public DateTime ExpiredDate { get; set; }
         public static explicit operator AccountDto(Account acc)
         {
             
@@ -17,7 +19,9 @@ namespace API.DTO.Accounts
                 Guid = acc.Guid,
                 Password = acc.Password,
                 IsDeleted = acc.IsDeleted,
-                IsUsed = acc.IsUsed
+                IsUsed = acc.IsUsed,
+                Otp = acc.Otp,
+                ExpiredDate = acc.ExpiredDate
             };
         }
 
@@ -29,6 +33,8 @@ namespace API.DTO.Accounts
                 Guid = accDto.Guid,
                 Password = accDto.Password,
                 IsUsed = accDto.IsUsed,
+                Otp = accDto.Otp,
+                ExpiredDate = accDto.ExpiredDate,
                 ModifiedDate = DateTime.Now
             };
         }

@@ -16,6 +16,7 @@ namespace API.DTO.Accounts
                 IsDeleted = false,
                 Otp = 1,
                 IsUsed = true,
+                ExpiredDate = DateTime.Now,
                 CreatedDate = DateTime.Now,
                 ModifiedDate = DateTime.Now
             };

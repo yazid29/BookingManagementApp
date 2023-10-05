@@ -3,8 +3,10 @@ using BookingManagementApp.Models;
 
 namespace API.DTO.Employees
 {
-    public class CreateEmployeeDto 
+    public class RegisterNewEmployeeDto
     {
+        // FirstName, LastName, Birtdate, Gender, HiringDate, Email, PhoneNumber, Major, Degree,
+        // GPA, University Code, University Name, Password, ConfirmPassword
         public string FirstName { get; set; }
         public string? LastName { get; set; }
         public DateTime BirthDate { get; set; }
@@ -12,14 +14,22 @@ namespace API.DTO.Employees
         public DateTime HiringDate { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public string Major { get; set; }
+        public string Degree { get; set; }
+        public float Gpa { get; set; }
+        public string UniversityCode { get; set; }
+        public string UniversityName { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
 
-        public static implicit operator Employee(CreateEmployeeDto CreateDto)
+        
+        public static implicit operator Employee(RegisterNewEmployeeDto CreateDto)
         {
             // setelah method dipanggil akan otomatis konversi isi atribut
             // konversi DTO ke Model agar dapat di Insert oleh Repository-Model
             return new Employee
             {
-                Guid = Guid.NewGuid(),
+                Guid = new Guid(),
                 FirstName = CreateDto.FirstName,
                 LastName = CreateDto.LastName,
                 BirthDate = CreateDto.BirthDate,
@@ -31,5 +41,6 @@ namespace API.DTO.Employees
                 ModifiedDate = DateTime.Now
             };
         }
+        
     }
 }

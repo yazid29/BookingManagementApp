@@ -9,6 +9,16 @@ namespace API.Repositories
     // sehingga dihubungkan repository dengan suatu contract, dan controller hanya perlu memanggil contract
     public class UniversityRepos : GeneralRepos<University>, IUniversityRepository
     {
-        public UniversityRepos(BookingManagementDBContext context) : base(context) { }
+        private readonly BookingManagementDBContext _contextEmp;
+        public UniversityRepos(BookingManagementDBContext context) : base(context) {
+            _contextEmp = context;
+        }
+
+        public University? GetUniversity(string code, string name)
+        {
+            var getlast = _contextEmp.Set<University>()
+                .Where(q => (q.Code == code && q.Name == name)).FirstOrDefault();
+            return getlast;
+        }
     }
 }

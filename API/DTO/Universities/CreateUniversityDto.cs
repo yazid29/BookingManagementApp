@@ -14,7 +14,7 @@ namespace API.DTO.Universities
             // konversi DTO ke Model University agar dapat di Insert oleh Repository-Model
             return new University
             {
-                Guid = new Guid(),
+                Guid = Guid.NewGuid(),
                 Code = createUniversityDto.Code,
                 Name = createUniversityDto.Name,
                 CreatedDate = DateTime.Now,

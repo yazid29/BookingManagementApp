@@ -19,5 +19,18 @@ namespace API.Repositories
                 OrderBy(nik => nik.Nik).LastOrDefault()?.Nik;
             return getlast;
         }
+        string? IEmployeeRepository.GetEmail(string email)
+        {
+            var emailEmp = _contextEmp.Set<Employee>()
+                .Where(q => (q.Email == email)).FirstOrDefault()?.Email;
+            return emailEmp;
+        }
+
+        public Employee? GetGuidByEmail(string email)
+        {
+            var emailEmp = _contextEmp.Set<Employee>()
+                .Where(q => (q.Email == email)).FirstOrDefault();
+            return emailEmp;
+        }
     }
 }

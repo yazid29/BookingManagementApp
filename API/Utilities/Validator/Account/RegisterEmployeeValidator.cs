@@ -1,14 +1,11 @@
 ﻿using API.DTO.Employees;
 using FluentValidation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace API.Utilities.Validator.Employee
+namespace API.Utilities.Validator.Account
 {
-    public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeDto>
+    public class RegisterEmployeeValidator : AbstractValidator<RegisterNewEmployeeDto>
     {
-        // add rule validation setiap field input
-        // setiap field memiliki validation yang berbeda
-        public CreateEmployeeValidator()
+        public RegisterEmployeeValidator()
         {
             RuleFor(e => e.FirstName)
                 .NotEmpty().WithMessage("FirstName harus diisi.")
@@ -42,6 +39,21 @@ namespace API.Utilities.Validator.Employee
                 .MinimumLength(10).WithMessage("PhoneNumber minimal 10 karakter")
                 .MaximumLength(20).WithMessage("PhoneNumber Tidak dapat menampung lebih dari 20 karakter")
                 .Matches("^[0-9]*$").WithMessage("PhoneNumber harus terdiri dari digit angka");
+            RuleFor(e => e.UniversityCode)
+               .NotEmpty().WithMessage("Guid Booking harus diisi");
+            RuleFor(e => e.UniversityName)
+               .NotEmpty().WithMessage("Guid Booking harus diisi");
+            RuleFor(e => e.Major)
+               .NotEmpty().WithMessage("Major harus diisi.")
+               .MaximumLength(100).WithMessage("Major tidak dapat menampung lebih dari 100")
+               .Matches("^[a-zA-Z\\s]*$").WithMessage("Major hanya boleh berisi huruf dan spasi");
+            RuleFor(e => e.Degree)
+               .NotEmpty().WithMessage("Degree harus diisi.")
+               .MaximumLength(100).WithMessage("Degree tidak dapat menampung lebih dari 100")
+               .Matches("^[a-zA-Z\\s]*$").WithMessage("Degree hanya boleh berisi huruf dan spasi");
+            RuleFor(e => e.Gpa)
+               .NotEmpty().WithMessage("Major harus diisi.")
+               .InclusiveBetween(0, 4).WithMessage("GPA harus berada di antara 0 dan 4");
         }
     }
 }

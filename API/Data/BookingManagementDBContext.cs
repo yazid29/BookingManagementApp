@@ -76,5 +76,10 @@ namespace API.Data
                 .HasForeignKey<Account>(e => e.Guid)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+        public static implicit operator DbContextTransaction(BookingManagementDBContext v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
