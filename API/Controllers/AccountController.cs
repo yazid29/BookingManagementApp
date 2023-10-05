@@ -10,6 +10,7 @@ using API.Utilities.Hashing;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Data.Entity;
 using System.Net;
@@ -28,8 +29,8 @@ namespace API.Controllers
         private readonly IEducationRepository _educationRepository;
         private readonly IUniversityRepository _universityRepository;
         private readonly IEmailHandler _emailHandler;
-
-        public AccountController(IAccountRepository accountRepository,
+        private readonly BookingManagementDBContext _dbContext;
+        public AccountController(BookingManagementDBContext dbContext,IAccountRepository accountRepository,
             IEmployeeRepository employeeRepository, IEducationRepository educationRepository,
             IUniversityRepository universityRepository, IEmailHandler emailHandler)
         {
@@ -38,6 +39,7 @@ namespace API.Controllers
             _educationRepository = educationRepository;
             _universityRepository = universityRepository;
             _emailHandler = emailHandler;
+            _dbContext = dbContext;
         }
 
         //login
@@ -92,13 +94,131 @@ namespace API.Controllers
             }
         }
 
-        // register new employee
+        // cek register menggunakan rollback
+        [HttpPost("cobaRegister")]
+        public IActionResult CobaRegister(RegisterNewEmployeeDto createAcc)
+        {
+            University toUniversity = new University();
+            var cekEmail = _employeeRepository.GetEmail(createAcc.Email);
+            
+            if (cekEmail is not null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = "Email Has Been Used"
+                });
+            }
+            if (createAcc.Password != createAcc.ConfirmPassword)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Status = HttpStatusCode.InternalServerError.ToString(),
+                    Message = "Failed to create data",
+                    Error = "The password and confirmation password do not match"
+                });
+            }
+            var cekUniv = _universityRepository.GetUniversity(createAcc.UniversityCode, createAcc.UniversityName);
+
+            // panggil transaction karena banyak perubahan dalam database
+            // using bersifat sementara
+            using (var transaction = _dbContext.Database.BeginTransaction())
+            {
+                try
+                {
+                    if (cekUniv is null)
+                    {
+                        toUniversity.Guid = Guid.NewGuid();
+                        toUniversity.Name = createAcc.UniversityName;
+                        toUniversity.Code = createAcc.UniversityCode;
+                        // add dan ekseksui
+                        _dbContext.Universities.Add(toUniversity);
+                        _dbContext.SaveChanges();
+                    }
+                    else
+                    {
+                        toUniversity = cekUniv;
+                        //return Ok(new ResponseOKHandler<University>(toUniversity));
+                    }
+
+                    // add employee
+                    Employee newEmp = createAcc;
+                    //generate Guid
+                    Guid newGuidd = Guid.NewGuid();
+                    //newEmp.Guid = newGuidd;
+
+                    //cek rollback jika univ berhasil dicreate
+                    var cekk = _employeeRepository.GetGuidByEmail(createAcc.Email);
+                    if (cekk is not null)
+                    {
+                        newEmp.Guid = cekk.Guid;
+                    }
+
+                    // generate NIK
+                    newEmp.Nik = GenerateHandler.GenerateNik(_employeeRepository.GetLastNik());
+                    // add Account
+                    Account newAccount = new Account();
+                    newAccount.Guid = newGuidd;
+                    newAccount.IsDeleted = false;
+                    newAccount.Otp = 0;
+                    newAccount.IsUsed = true;
+                    newAccount.ExpiredDate = DateTime.Now;
+                    newAccount.Password = HashingHandler.HashPassword(createAcc.Password);
+                    newAccount.CreatedDate = DateTime.Now;
+                    newAccount.ModifiedDate = DateTime.Now;
+
+                    // add education
+
+                    Education newEducation = new Education();
+                    newEducation.Guid = newGuidd;
+                    newEducation.Major = createAcc.Major;
+                    newEducation.Degree = createAcc.Degree;
+                    newEducation.Gpa = createAcc.Gpa;
+                    newEducation.UniversityGuid = toUniversity.Guid;
+
+
+                    //return Ok(new ResponseOKHandler<Employee>(newEmp));
+                    // insert all
+                    // add dan ubah satu persatu agar tercatat ditransaction
+                    _dbContext.Employees.Add(newEmp);
+                    _dbContext.SaveChanges();
+                    _dbContext.Accounts.Add(newAccount);
+                    _dbContext.SaveChanges();
+                    _dbContext.Educations.Add(newEducation);
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                    //var cek = _employeeRepository.Create(newEmp);
+                    //var cek2 = _accountRepository.Create(newAccount);
+                    //var cek3 = _educationRepository.Create(newEducation);
+                    // konversi sesuai yang ada di DTO untuk mengemas data
+                    return Ok(new ResponseOKHandler<string>("Created"));
+                }
+                catch (ExceptionHandler ex)
+                {
+                    // Jika terjadi kesalahan, lakukan rollback transaksi.
+                    transaction.Rollback();
+                    // message error jika gagal Insert into DB
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
+                    {
+                        Code = StatusCodes.Status500InternalServerError,
+                        Status = HttpStatusCode.InternalServerError.ToString(),
+                        Message = "Failed to create University",
+                        Error = ex.Message
+                    });
+                }
+            }
+        }
+
+        // register tanpa rollback
         [HttpPost("register")]
         public IActionResult Register(RegisterNewEmployeeDto createAcc)
         {
             University toUniversity = new University();
             //var cekEmail = _employeeRepository.GetEmail(createAcc.Email);
-
             if (createAcc.Password != createAcc.ConfirmPassword)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
