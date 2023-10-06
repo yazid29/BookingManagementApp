@@ -11,9 +11,6 @@ namespace API.Utilities.Validator.Account
         {
             RuleFor(e => e.Guid)
                .NotEmpty().WithMessage("Guid Booking harus diisi");
-            RuleFor(e => e.IsDeleted)
-               .NotEmpty().WithMessage("IsDeleted Booking harus diisi");
-
             RuleFor(e => e.IsUsed)
                .NotEmpty().WithMessage("IsUsed Booking harus diisi");
         }

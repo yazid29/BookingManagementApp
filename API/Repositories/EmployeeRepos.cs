@@ -21,8 +21,7 @@ namespace API.Repositories
         }
         string? IEmployeeRepository.GetEmail(string email)
         {
-            var emailEmp = _contextEmp.Set<Employee>()
-                .Where(q => (q.Email == email)).FirstOrDefault()?.Email;
+            var emailEmp = _contextEmp.Set<Employee>().FirstOrDefault(q => (q.Email == email))?.Email;
             return emailEmp;
         }
 

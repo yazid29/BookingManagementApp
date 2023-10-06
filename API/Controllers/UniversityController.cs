@@ -3,6 +3,7 @@ using API.DTO.Employees;
 using API.DTO.Universities;
 using API.Utilities.Handler;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -22,6 +23,7 @@ namespace API.Controllers
         }
 
         // tampilkan semua data dengan metode GET
+        [EnableCors]
         [HttpGet]
         public IActionResult GetAll()
         {

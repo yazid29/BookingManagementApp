@@ -1,6 +1,8 @@
 ﻿using API.Contracts;
 using API.Data;
 using BookingManagementApp.Models;
+using System.Data.Entity;
+
 namespace API.Repositories
 {
     public class GeneralRepos<TEntity> : IGeneralRepos<TEntity> where TEntity : class
@@ -12,6 +14,10 @@ namespace API.Repositories
             _context = context;
         }
 
+        public BookingManagementDBContext GetContext()
+        {
+            return _context;
+        }
         public IEnumerable<TEntity> GetAll()
         {
             return _context.Set<TEntity>().ToList();
@@ -65,5 +71,6 @@ namespace API.Repositories
                 return false;
             }
         }
+
     }
 }

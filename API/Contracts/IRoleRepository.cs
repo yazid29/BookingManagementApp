@@ -4,6 +4,8 @@ namespace API.Contracts
 {
     public interface IRoleRepository : IGeneralRepos<Role>
     {
+        public Guid? GetDefaultRoleGuid();
+        public Guid? GetRoleGuid(string name);
         /*
         IEnumerable<Role> GetAll();
         Role? GetByGuid(Guid guid);

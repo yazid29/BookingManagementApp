@@ -8,12 +8,15 @@ using API.Utilities.Enums;
 using API.Utilities.Handler;
 using API.Utilities.Hashing;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Data.Entity;
 using System.Net;
+using System.Security.Claims;
 using System.Transactions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -22,28 +25,38 @@ namespace API.Controllers
     [ApiController]
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
+    [EnableCors]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IEducationRepository _educationRepository;
         private readonly IUniversityRepository _universityRepository;
+        private readonly IAccountRoleRepository _accountRoleRepository;
+        private readonly IRoleRepository _roleRepository;
         private readonly IEmailHandler _emailHandler;
-        private readonly BookingManagementDBContext _dbContext;
-        public AccountController(BookingManagementDBContext dbContext,IAccountRepository accountRepository,
-            IEmployeeRepository employeeRepository, IEducationRepository educationRepository,
-            IUniversityRepository universityRepository, IEmailHandler emailHandler)
+        private readonly ITokenHandler _tokenHandler;
+        public AccountController(IAccountRoleRepository accountRoleRepository, 
+            IAccountRepository accountRepository,
+            IEmployeeRepository employeeRepository, 
+            IEducationRepository educationRepository,
+            IUniversityRepository universityRepository,IRoleRepository roleRepository,
+            IEmailHandler emailHandler, ITokenHandler tokenHandler)
         {
             _accountRepository = accountRepository;
             _employeeRepository = employeeRepository;
             _educationRepository = educationRepository;
             _universityRepository = universityRepository;
+            _accountRoleRepository = accountRoleRepository;
+            _roleRepository = roleRepository;
             _emailHandler = emailHandler;
-            _dbContext = dbContext;
+            _tokenHandler = tokenHandler;
         }
 
         //login
         [HttpPost("login")]
+        [AllowAnonymous]
         public IActionResult Login(LoginDto login)
         {
             var cekEmail = _employeeRepository.GetGuidByEmail(login.Email);
@@ -57,164 +70,50 @@ namespace API.Controllers
                 });
             }
 
-            try
+            var account = _accountRepository.GetByGuid(cekEmail.Guid);
+            if (account is null)
             {
-                var entity = _accountRepository.GetByGuid(cekEmail.Guid);
-                if (entity is null)
+                return NotFound(new ResponseErrorHandler
                 {
-                    return NotFound(new ResponseErrorHandler
-                    {
-                        Code = StatusCodes.Status404NotFound,
-                        Status = HttpStatusCode.NotFound.ToString(),
-                        Message = "Data Not Found"
-                    });
-                }
-                bool isPasswordValid = HashingHandler.VerifyPassword(login.Password, entity.Password);
-                if (!isPasswordValid)
-                {
-                    return NotFound(new ResponseErrorHandler
-                    {
-                        Code = StatusCodes.Status404NotFound,
-                        Status = HttpStatusCode.NotFound.ToString(),
-                        Message = "AAccount or Password is invalid"
-                    });
-                }
-                return Ok(new ResponseOKHandler<string>("Login Berhasil"));
-            }
-            catch (ExceptionHandler ex)
-            {
-                // message error jika gagal update
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
-                {
-                    Code = StatusCodes.Status500InternalServerError,
-                    Status = HttpStatusCode.InternalServerError.ToString(),
-                    Message = "Failed to update data",
-                    Error = ex.Message
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Not Found"
                 });
             }
-        }
+            bool isPasswordValid = HashingHandler.VerifyPassword(login.Password, account.Password);
+            if (!isPasswordValid)
+            {
+                return NotFound(new ResponseErrorHandler
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "AAccount or Password is invalid"
+                });
+            }
 
-        // cek register menggunakan rollback
-        [HttpPost("cobaRegister")]
-        public IActionResult CobaRegister(RegisterNewEmployeeDto createAcc)
-        {
-            University toUniversity = new University();
-            var cekEmail = _employeeRepository.GetEmail(createAcc.Email);
+            // atur isi yang ingin dimasukan dalam isi token (Claim)
+            var claims = new List<Claim>();
+            claims.Add(new Claim("Email", cekEmail.Email));
+            claims.Add(new Claim("FullName", string.Concat(cekEmail.FirstName + " " + cekEmail.LastName)));
+            var getRoleName = from ar in _accountRoleRepository.GetAll()
+                              join r in _roleRepository.GetAll() on ar.RoleGuid equals r.Guid
+                              where ar.AccountGuid == account.Guid
+                              select r.Name;
+
             
-            if (cekEmail is not null)
+            foreach (var roleName in getRoleName)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
-                {
-                    Code = StatusCodes.Status500InternalServerError,
-                    Status = HttpStatusCode.InternalServerError.ToString(),
-                    Message = "Failed to create data",
-                    Error = "Email Has Been Used"
-                });
+                claims.Add(new Claim(ClaimTypes.Role, roleName));
             }
-            if (createAcc.Password != createAcc.ConfirmPassword)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
-                {
-                    Code = StatusCodes.Status500InternalServerError,
-                    Status = HttpStatusCode.InternalServerError.ToString(),
-                    Message = "Failed to create data",
-                    Error = "The password and confirmation password do not match"
-                });
-            }
-            var cekUniv = _universityRepository.GetUniversity(createAcc.UniversityCode, createAcc.UniversityName);
+            // generate atau hasilkan token sesuai isi yang ditambahkan pada claim
+            var generateToken = _tokenHandler.Generate(claims);
 
-            // panggil transaction karena banyak perubahan dalam database
-            // using bersifat sementara
-            using (var transaction = _dbContext.Database.BeginTransaction())
-            {
-                try
-                {
-                    if (cekUniv is null)
-                    {
-                        toUniversity.Guid = Guid.NewGuid();
-                        toUniversity.Name = createAcc.UniversityName;
-                        toUniversity.Code = createAcc.UniversityCode;
-                        // add dan ekseksui
-                        _dbContext.Universities.Add(toUniversity);
-                        _dbContext.SaveChanges();
-                    }
-                    else
-                    {
-                        toUniversity = cekUniv;
-                        //return Ok(new ResponseOKHandler<University>(toUniversity));
-                    }
-
-                    // add employee
-                    Employee newEmp = createAcc;
-                    //generate Guid
-                    Guid newGuidd = Guid.NewGuid();
-                    //newEmp.Guid = newGuidd;
-
-                    //cek rollback jika univ berhasil dicreate
-                    var cekk = _employeeRepository.GetGuidByEmail(createAcc.Email);
-                    if (cekk is not null)
-                    {
-                        newEmp.Guid = cekk.Guid;
-                    }
-
-                    // generate NIK
-                    newEmp.Nik = GenerateHandler.GenerateNik(_employeeRepository.GetLastNik());
-                    // add Account
-                    Account newAccount = new Account();
-                    newAccount.Guid = newGuidd;
-                    newAccount.IsDeleted = false;
-                    newAccount.Otp = 0;
-                    newAccount.IsUsed = true;
-                    newAccount.ExpiredDate = DateTime.Now;
-                    newAccount.Password = HashingHandler.HashPassword(createAcc.Password);
-                    newAccount.CreatedDate = DateTime.Now;
-                    newAccount.ModifiedDate = DateTime.Now;
-
-                    // add education
-
-                    Education newEducation = new Education();
-                    newEducation.Guid = newGuidd;
-                    newEducation.Major = createAcc.Major;
-                    newEducation.Degree = createAcc.Degree;
-                    newEducation.Gpa = createAcc.Gpa;
-                    newEducation.UniversityGuid = toUniversity.Guid;
-
-
-                    //return Ok(new ResponseOKHandler<Employee>(newEmp));
-                    // insert all
-                    // add dan ubah satu persatu agar tercatat ditransaction
-                    _dbContext.Employees.Add(newEmp);
-                    _dbContext.SaveChanges();
-                    _dbContext.Accounts.Add(newAccount);
-                    _dbContext.SaveChanges();
-                    _dbContext.Educations.Add(newEducation);
-                    _dbContext.SaveChanges();
-
-                    transaction.Commit();
-                    //var cek = _employeeRepository.Create(newEmp);
-                    //var cek2 = _accountRepository.Create(newAccount);
-                    //var cek3 = _educationRepository.Create(newEducation);
-                    // konversi sesuai yang ada di DTO untuk mengemas data
-                    return Ok(new ResponseOKHandler<string>("Created"));
-                }
-                catch (ExceptionHandler ex)
-                {
-                    // Jika terjadi kesalahan, lakukan rollback transaksi.
-                    transaction.Rollback();
-                    // message error jika gagal Insert into DB
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
-                    {
-                        Code = StatusCodes.Status500InternalServerError,
-                        Status = HttpStatusCode.InternalServerError.ToString(),
-                        Message = "Failed to create University",
-                        Error = ex.Message
-                    });
-                }
-            }
+            return Ok(new ResponseOKHandler<object>("Login Berhasil",new {Token = generateToken}));
         }
 
-        // register tanpa rollback
+        // register dengan rollback
         [HttpPost("register")]
+        [AllowAnonymous]
         public IActionResult Register(RegisterNewEmployeeDto createAcc)
         {
             University toUniversity = new University();
@@ -230,6 +129,8 @@ namespace API.Controllers
                 });
             }
             var cekUniv = _universityRepository.GetUniversity(createAcc.UniversityCode, createAcc.UniversityName);
+            using var context = _accountRepository.GetContext();
+            using var transaction = context.Database.BeginTransaction();
             try
             {
                 if (cekUniv is null)
@@ -249,28 +150,6 @@ namespace API.Controllers
                 Employee newEmp = createAcc;
                 newEmp.Guid = newGuidd;
                 newEmp.Nik = GenerateHandler.GenerateNik(_employeeRepository.GetLastNik());
-                // add Account
-                Account newAccount = new Account();
-                newAccount.Guid = newGuidd;
-                newAccount.IsDeleted = false;
-                newAccount.Otp = 0;
-                newAccount.IsUsed = true;
-                newAccount.ExpiredDate = DateTime.Now;
-                newAccount.Password = HashingHandler.HashPassword(createAcc.Password);
-                newAccount.CreatedDate = DateTime.Now;
-                newAccount.ModifiedDate = DateTime.Now;
-
-                // add education
-
-                Education newEducation = new Education();
-                newEducation.Guid = newGuidd;
-                newEducation.Major = createAcc.Major;
-                newEducation.Degree = createAcc.Degree;
-                newEducation.Gpa = createAcc.Gpa;
-                newEducation.UniversityGuid = toUniversity.Guid;
-
-                //return Ok(new ResponseOKHandler<Employee>(newEmp));
-                // insert all
                 var cek = _employeeRepository.Create(newEmp);
                 if (cek is null)
                 {
@@ -281,6 +160,19 @@ namespace API.Controllers
                         Message = "Failed to create Employee",
                     });
                 }
+
+
+                // add Account
+                Account newAccount = new Account();
+                newAccount.Guid = newGuidd;
+                newAccount.IsDeleted = false;
+                newAccount.Otp = 0;
+                newAccount.IsUsed = true;
+                newAccount.ExpiredDate = DateTime.Now;
+                newAccount.Password = HashingHandler.HashPassword(createAcc.Password);
+                newAccount.CreatedDate = DateTime.Now;
+                newAccount.ModifiedDate = DateTime.Now;
+                
                 var cek2 = _accountRepository.Create(newAccount);
                 if (cek2 is null)
                 {
@@ -291,6 +183,14 @@ namespace API.Controllers
                         Message = "Failed to create Acc",
                     });
                 }
+                // add education
+                Education newEducation = new Education();
+                newEducation.Guid = newGuidd;
+                newEducation.Major = createAcc.Major;
+                newEducation.Degree = createAcc.Degree;
+                newEducation.Gpa = createAcc.Gpa;
+                newEducation.UniversityGuid = toUniversity.Guid;
+
                 var cek3 = _educationRepository.Create(newEducation);
                 if (cek3 is null)
                 {
@@ -302,26 +202,34 @@ namespace API.Controllers
                     });
                 }
 
-                // konversi sesuai yang ada di DTO untuk mengemas data
-                return Ok(new ResponseOKHandler<string>("Created"));
+                var accountRole = _accountRoleRepository.Create(new AccountRole
+                {
+                    AccountGuid = newAccount.Guid,
+                    RoleGuid = _roleRepository.GetRoleGuid("User") ?? throw new Exception("Default Role Not Found")
+                });
+
+                
+                transaction.Commit();
+                return Ok(new ResponseOKHandler<string>("Account Created"));
             }
-            catch (ExceptionHandler ex)
+            catch (Exception ex)
             {
                 // Jika terjadi kesalahan, lakukan rollback transaksi.
-                //
+                transaction.Rollback();
                 // message error jika gagal Insert into DB
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseErrorHandler
                 {
                     Code = StatusCodes.Status500InternalServerError,
                     Status = HttpStatusCode.InternalServerError.ToString(),
-                    Message = "Failed to create University",
-                    Error = ex.Message
+                    Message = "Failed to create Employee",
+                    Error = ex.InnerException?.Message ?? ex.Message
                 });
             }
         }
 
         // forgot password email
         [HttpPost("forgotPassword")]
+        [AllowAnonymous]
         public IActionResult ForgotPassword(ForgotPasswordDto forgotpw)
         {
             var cekEmail = _employeeRepository.GetGuidByEmail(forgotpw.Email);
@@ -375,6 +283,7 @@ namespace API.Controllers
 
         // change password account
         [HttpPost("changePassword")]
+        [AllowAnonymous]
         public IActionResult ChangePassword(ChangePasswordDto changepw)
         {
             var cekEmail = _employeeRepository.GetGuidByEmail(changepw.Email);
@@ -493,6 +402,7 @@ namespace API.Controllers
             }
         }
 
+
         // tampilkan semua data dengan metode GET
         [HttpGet]
         public IActionResult GetAll()
@@ -570,6 +480,7 @@ namespace API.Controllers
 
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Delete(Guid guid)
         {
             try
