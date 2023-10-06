@@ -26,7 +26,7 @@ namespace API.Controllers
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
     [EnableCors]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountRepository _accountRepository;
@@ -480,7 +480,6 @@ namespace API.Controllers
 
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Delete(Guid guid)
         {
             try

@@ -4,6 +4,7 @@ using API.DTO.Employees;
 using API.Utilities.Handler;
 using API.Utilities.Hashing;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
@@ -13,6 +14,7 @@ namespace API.Controllers
     [ApiController]
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
+    [Authorize(Roles = "Manager")]
     public class EmployeeController : ControllerBase
     {
 

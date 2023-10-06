@@ -3,6 +3,7 @@ using API.DTO.Roles;
 using API.DTO.Rooms;
 using API.Utilities.Handler;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -11,6 +12,7 @@ namespace API.Controllers
     [ApiController]
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleRepository _roleRepository;

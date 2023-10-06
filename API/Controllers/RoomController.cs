@@ -3,6 +3,7 @@ using API.DTO.Rooms;
 using API.DTO.Universities;
 using API.Utilities.Handler;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -11,6 +12,7 @@ namespace API.Controllers
     [ApiController]
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class RoomController : ControllerBase
     {
         // hubungkan repository dengan controller melalui contracts

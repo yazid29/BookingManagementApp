@@ -2,6 +2,7 @@
 using API.DTO.Educations;
 using API.Utilities.Handler;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Net;
@@ -11,6 +12,7 @@ namespace API.Controllers
     [ApiController]
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class EducationController : ControllerBase
     {
         private readonly IEducationRepository _educationRepository;

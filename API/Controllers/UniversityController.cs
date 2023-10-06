@@ -3,6 +3,7 @@ using API.DTO.Employees;
 using API.DTO.Universities;
 using API.Utilities.Handler;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -12,6 +13,7 @@ namespace API.Controllers
     [ApiController]
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class UniversityController : ControllerBase
     {
         // hubungkan repository dengan controller

@@ -2,6 +2,7 @@
 using API.DTO.Bookings;
 using API.Utilities.Handler;
 using BookingManagementApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -14,11 +15,12 @@ namespace API.Controllers
     public class BookingController : ControllerBase
     {
         private readonly IBookingRepository _bookingRepository;
-        public BookingController(IBookingRepository bookingRepository) { 
+        public BookingController(IBookingRepository bookingRepository) {
             _bookingRepository = bookingRepository;
         }
         // kirimkan data untuk diInsert ke Database dengan metode POST
         [HttpPost]
+        [Authorize]
         public IActionResult Create(CreateBookingDto bookingDto)
         {
             try
@@ -39,8 +41,10 @@ namespace API.Controllers
                 });
             }
         }
+        
         // tampilkan semua data dengan metode GET
         [HttpGet]
+        [Authorize]
         public IActionResult GetAll()
         {
             var result = _bookingRepository.GetAll();
@@ -57,8 +61,10 @@ namespace API.Controllers
             var data = result.Select(item => (BookingDto) item);
             return Ok(new ResponseOKHandler<IEnumerable<BookingDto>>(data));
         }
+        
         // tampilkan data sesuai ID dengan metode GET
         [HttpGet("{guid}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetByGuid(Guid guid)
         {
             var result = _bookingRepository.GetByGuid(guid);
@@ -74,8 +80,10 @@ namespace API.Controllers
             // konversi sesuai yang ada di DTO untuk mengemas data
             return Ok(new ResponseOKHandler<BookingDto>((BookingDto)result));
         }
+        
         // Update data sesuai ID dengan metode PUT
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public IActionResult Update(BookingDto bookingDto)
         {
             try
@@ -109,8 +117,10 @@ namespace API.Controllers
                 });
             }
         }
+        
         // Delete data sesuai ID dengan metode DELETE
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(Guid guid)
         {
             try
