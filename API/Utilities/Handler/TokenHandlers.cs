@@ -30,5 +30,22 @@ namespace API.Utilities.Handler
 
             return encodedToken;
         }
+
+        public string GetEmailfromToken(string authorizationHeader)
+        {
+            string emailClaim = "";
+            if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
+            {
+                // Token ada dalam format "Bearer {token}"
+                string token = authorizationHeader.Substring("Bearer ".Length);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var data = (JwtSecurityToken)tokenHandler.ReadToken(token);
+                var claims = data.Claims;
+
+                // Mencari klaim dengan tipe Email seperti ketika create token
+                emailClaim = claims.FirstOrDefault(c => c.Type == "Email").Value;
+            }
+            return emailClaim;
+        }
     }
 }

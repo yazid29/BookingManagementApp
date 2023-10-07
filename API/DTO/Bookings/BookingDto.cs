@@ -9,7 +9,9 @@ namespace API.DTO.Bookings
         public DateTime EndDate { get; set; }
         public StatusLevel Status { get; set; }
         public string Remarks { get; set; }
-        
+        public Guid RoomGuid { get; set; }
+        public Guid EmployeeGuid { get; set; }
+
         public static explicit operator BookingDto(Booking booking)
         {
             // atribut yang ingin ditampilkan dan diisi oleh User
@@ -19,7 +21,9 @@ namespace API.DTO.Bookings
                 StartDate = booking.StartDate,
                 EndDate = booking.EndDate,
                 Status = booking.Status,
-                Remarks = booking.Remarks
+                Remarks = booking.Remarks,
+                RoomGuid = booking.RoomGuid,
+                EmployeeGuid = booking.EmployeeGuid
             };
         }
 
@@ -32,6 +36,8 @@ namespace API.DTO.Bookings
                 EndDate = bookingDto.EndDate,
                 Status = bookingDto.Status,
                 Remarks = bookingDto.Remarks,
+                RoomGuid = bookingDto.RoomGuid,
+                EmployeeGuid = bookingDto.EmployeeGuid,
                 ModifiedDate = DateTime.Now
             };
         }

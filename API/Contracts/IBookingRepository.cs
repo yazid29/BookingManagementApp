@@ -1,4 +1,5 @@
-﻿using BookingManagementApp.Models;
+﻿using API.DTO.Bookings;
+using BookingManagementApp.Models;
 
 namespace API.Contracts
 {

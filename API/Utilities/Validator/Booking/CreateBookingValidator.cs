@@ -1,6 +1,7 @@
 ﻿using API.DTO.Bookings;
 using API.Utilities.Enums;
 using FluentValidation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Utilities.Validator.Booking
 {
@@ -11,19 +12,21 @@ namespace API.Utilities.Validator.Booking
         public CreateBookingValidator()
         {
             RuleFor(e => e.StartDate)
-               .NotEmpty().WithMessage("StartDate Booking harus diisi")
-               .Must(date => date >= DateTime.Now).WithMessage("Tanggal StartDate Booking tidak valid");
+            .NotEmpty().WithMessage("StartDate Booking harus diisi")
+               .Must(date => date >= DateTime.Now.Date).WithMessage("Tanggal StartDate Booking tidak valid");
 
             RuleFor(e => e.EndDate)
                .NotEmpty().WithMessage("EndDate Booking harus diisi")
                .GreaterThan(DateTime.Now).WithMessage("Tanggal EndDate Booking tidak valid");
 
-            RuleFor(e => e.Status)
-               .NotEmpty().WithMessage("Status Booking harus diisi")
-               .IsInEnum();
-
             RuleFor(e => e.Remarks)
                .NotEmpty().WithMessage("Remarks Booking harus diisi");
+
+            RuleFor(e => e.RoomGuid)
+               .NotEmpty().WithMessage("Guid Room harus diisi");
+
+            RuleFor(e => e.EmployeeGuid)
+               .NotEmpty().WithMessage("Guid Employee harus diisi");
         }
     }
 }

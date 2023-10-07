@@ -16,7 +16,7 @@ namespace API.Utilities.Validator.Booking
 
             RuleFor(e => e.StartDate)
                .NotEmpty().WithMessage("StartDate Booking harus diisi")
-               .Must(date => date >= DateTime.Now).WithMessage("Tanggal StartDate Booking tidak valid");
+               .Must(date => date >= DateTime.Now.Date).WithMessage("Tanggal StartDate Booking tidak valid");
 
             RuleFor(e => e.EndDate)
                .NotEmpty().WithMessage("EndDate Booking harus diisi")
