@@ -162,11 +162,12 @@ namespace API.Controllers
                            join emp in employees on bo.EmployeeGuid equals emp.Guid
                            join ro in rooms on bo.RoomGuid equals ro.Guid
                            where bo.Guid == guid
-                           select new BookingDetailsDto
+                           select new
                            {
                                Guid = bo.Guid,
                                BookedNIK = emp.Nik,
                                BookedBy = string.Concat(emp.FirstName, " ", emp.LastName),
+                               RoomGuid = ro.Guid,
                                RoomName = ro.Name,
                                StartDate = bo.StartDate,
                                EndDate = bo.EndDate,
@@ -207,9 +208,14 @@ namespace API.Controllers
                     }
                 }
             }
-
+            BookingLengthDto lengthBooking = new BookingLengthDto
+            {
+                RoomGuid = cek.RoomGuid,
+                RoomName = cek.RoomName,
+                BookingLength = realDuration
+            };
             // kirim durasi tanpa hari minggu/sabtu
-            return Ok(new ResponseOKHandler<int>(realDuration));
+            return Ok(new ResponseOKHandler<BookingLengthDto>(lengthBooking));
         }
         // tampilkan detail data room yang tidak digunakan pada hari ini
         [HttpGet("room-not-used")]
