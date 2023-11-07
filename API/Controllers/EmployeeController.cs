@@ -12,9 +12,10 @@ using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 namespace API.Controllers
 {
     [ApiController]
+
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
-    [Authorize(Roles = "Manager")]
+    //[Authorize(Roles = "Manager")]
     public class EmployeeController : ControllerBase
     {
 
@@ -29,7 +30,7 @@ namespace API.Controllers
             _universityRepository = universityRepository;
 
         }
-        
+
         [HttpGet("details")]
         public IActionResult GetDetails()
         {
@@ -78,7 +79,7 @@ namespace API.Controllers
                 toCreate.Nik = GenerateHandler.GenerateNik(_employeeRepository.GetLastNik());
                 var result = _employeeRepository.Create(toCreate);
                 // konversi sesuai yang ada di DTO untuk mengemas data
-                return Ok(new ResponseOKHandler<EmployeeDto>((EmployeeDto) result));
+                return Ok(new ResponseOKHandler<EmployeeDto>((EmployeeDto)result));
             }
             catch (ExceptionHandler ex)
             {
@@ -108,7 +109,7 @@ namespace API.Controllers
                 });
             }
             // konversi sesuai yang ada di DTO untuk mengemas data
-            var data = result.Select(item => (EmployeeDto) item);
+            var data = result.Select(item => (EmployeeDto)item);
             //return Ok(data);
             return Ok(new ResponseOKHandler<IEnumerable<EmployeeDto>>(data));
         }
@@ -169,7 +170,7 @@ namespace API.Controllers
             }
         }
         // Delete data sesuai ID dengan metode DELETE
-        [HttpDelete]
+        [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
             try

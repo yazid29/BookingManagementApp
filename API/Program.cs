@@ -112,10 +112,10 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        //policy.AllowAnyOrigin();
-        policy.WithOrigins("https://localhost:58889/");
+        policy.AllowAnyOrigin();
+        //policy.WithOrigins("https://localhost:7002/");
         policy.AllowAnyHeader();
-        policy.WithMethods("POST");
+        policy.AllowAnyMethod();
     });
 });
 var app = builder.Build();

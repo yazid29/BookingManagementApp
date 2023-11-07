@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using API.DTO.Accounts;
+using System.Security.Claims;
 
 namespace API.Contracts
 {
@@ -6,5 +7,6 @@ namespace API.Contracts
     {
         string Generate(IEnumerable<Claim> claims);
         string GetEmailfromToken(string auth);
+        ClaimsDTO ExtractClaimsFromJwt(string token);
     }
 }

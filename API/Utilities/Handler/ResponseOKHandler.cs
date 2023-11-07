@@ -18,7 +18,10 @@ namespace API.Utilities.Handler
             Message = "Success to Retrieve Data";
             Data = data;
         }
-
+        public ResponseOKHandler()
+        {
+            
+        }
         // respon berhasil tanpa data
         public ResponseOKHandler(string message)
         {

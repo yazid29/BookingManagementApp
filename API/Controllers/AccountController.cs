@@ -26,7 +26,7 @@ namespace API.Controllers
     // atur routes agar dapat diakses oleh user
     [Route("api/[controller]")]
     [EnableCors]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IAccountRepository _accountRepository;
@@ -93,14 +93,14 @@ namespace API.Controllers
 
             // atur isi yang ingin dimasukan dalam isi token (Claim)
             var claims = new List<Claim>();
-            claims.Add(new Claim("Email", cekEmail.Email));
-            claims.Add(new Claim("FullName", string.Concat(cekEmail.FirstName + " " + cekEmail.LastName)));
+            
             var getRoleName = from ar in _accountRoleRepository.GetAll()
                               join r in _roleRepository.GetAll() on ar.RoleGuid equals r.Guid
                               where ar.AccountGuid == account.Guid
                               select r.Name;
 
-            
+            claims.Add(new Claim(ClaimTypes.Email, cekEmail.Email));
+            claims.Add(new Claim(ClaimTypes.Name, $"{cekEmail.FirstName} {cekEmail.LastName}"));
             foreach (var roleName in getRoleName)
             {
                 claims.Add(new Claim(ClaimTypes.Role, roleName));
@@ -108,7 +108,14 @@ namespace API.Controllers
             // generate atau hasilkan token sesuai isi yang ditambahkan pada claim
             var generateToken = _tokenHandler.Generate(claims);
 
-            return Ok(new ResponseOKHandler<object>("Login Berhasil",new {Token = generateToken}));
+            return Ok(new ResponseOKHandler<object>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Login Success",
+                Data = new { Token = generateToken }
+            });
+            //return Ok(new ResponseOKHandler<object>("Login Berhasil",new {Token = generateToken}));
         }
 
         // register dengan rollback
@@ -510,6 +517,20 @@ namespace API.Controllers
                     Error = ex.Message
                 });
             }
+        }
+
+        [HttpGet("GetClaims/{token}")]
+        public IActionResult GetClaims(string token)
+        {
+
+            var claims = _tokenHandler.ExtractClaimsFromJwt(token);
+            return Ok(new ResponseOKHandler<ClaimsDTO>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Claims has been retrieved",
+                Data = claims
+            });
         }
     }
 }
