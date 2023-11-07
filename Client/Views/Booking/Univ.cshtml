@@ -1,0 +1,155 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_AdminLayout";
+}
+
+<table class="table table-bordered table-hover m-auto mt-3" id="tbl-employee">
+    <thead style="background-color:aliceblue">
+        <tr>
+            <th>No</th>
+            <th>NIK</th>
+            <th>FullName</th>
+            <th>Gender</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyPoke">
+    </tbody>
+</table>
+@* Modal *@
+<div class="modal fade" id="modalRoom" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="createData()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal Add *@
+<div class="modal fade" id="modalAdd" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalAddLabel">Add Data Employee</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="quickForm_add">
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <input type="hidden" class="form-control" name="guid" id="guid">
+                        <input type="hidden" class="form-control" name="nik" id="nik">
+                        <div class="form-group">
+                            <label for="firstname">First Name</label>
+                            <input type="text" class="form-control" name="firstname" id="firstname" placeholder="First Name" value="Coba">
+                            <div id="firstname-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastname">Last Name</label>
+                            <input type="text" class="form-control" name="lastname" id="lastname" value="InsertDulu">
+                            <div id="lastname-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastname">Email</label>
+                            <input type="email" class="form-control" name="email" id="email" value="insert@gmail.com">
+                            <div id="lastname-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthdate">Birth Date</label>
+                            <div class="input-group date"  data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input" data-target="#birthdate" id="birthdate" value="12/12/1998" />
+                                <div class="input-group-append" data-target="#birthdate" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                            <div id="birthdate-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select class="form-select form-select mb-3" aria-label="Large select example" name="gender" id="gender">
+                                <option selected>Select</option>
+                                <option value="0">Female</option>
+                                <option selected value="1">Male</option>
+                            </select>
+                            <div id="gender-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="hiringdate">Hiring Date</label>
+                            <div class="input-group">
+                                <div class="input-group date" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" id="hiringdate" data-target="#hiringdate" value="12/12/2020" />
+                                    <div class="input-group-append" data-target="#hiringdate" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="hiringdate-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                </div>
+                                <input type="tel" class="form-control input_number" name="phonenumber" id="phonenumber"
+                                       pattern="[0-9]{10}" placeholder="Ex: 082345678910" value="082233334444">
+                            </div>
+                            <div id="phonenumber-error"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+                <div class="modal-footer" id="footerModalAdd">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveData()" id="save">Save changes</button>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section CssSection{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="~/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <!-- Toastr -->
+    <link rel="stylesheet" href="~/adminlte/plugins/toastr/toastr.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="~/adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+
+}
+@section Scripts{
+    <!-- SweetAlert2 -->
+    <script src="~/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- Toastr -->
+    <script src="~/adminlte/plugins/toastr/toastr.min.js"></script>
+    <!-- jQuery UI 1.11.4 -->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    <!-- InputMask -->
+    <script src="~/adminlte/plugins/moment/moment.min.js"></script>
+    <script src="~/adminlte/plugins/inputmask/jquery.inputmask.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="~/adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/js/booking.js" asp-append-version="true"></script>
+}
